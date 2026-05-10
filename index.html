@@ -101,6 +101,13 @@
     <!-- Error / Success message -->
     <div id="auth-error" class="auth-error"></div>
 
+    <!-- Try without account -->
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--glass-border)">
+      <button id="try-demo-btn" style="background:none;border:none;color:var(--gray-400);font-size:12px;cursor:pointer;text-decoration:underline;transition:color .15s">
+        Probar sin cuenta →
+      </button>
+    </div>
+
     <p class="auth-footer">
       © 2026 <a href="https://markfiorente.com" target="_blank" rel="noopener">markfiorente.com</a>
       — FIFA World Cup 2026 Sticker Tracker
@@ -112,6 +119,12 @@
      MAIN APP (hidden until authenticated)
      ================================================================ -->
 <div id="app" class="hidden">
+
+  <!-- Demo mode banner -->
+  <div id="demo-banner" class="hidden" style="background:linear-gradient(90deg,rgba(245,166,35,.18),rgba(200,16,46,.12));border-bottom:1px solid rgba(245,166,35,.3);padding:8px 16px;font-size:12px;color:var(--gold);display:flex;align-items:center;gap:12px;justify-content:center;">
+    <span>⚡ Modo Demo — los datos se guardan en este navegador.</span>
+    <a href="#" onclick="document.getElementById('auth-overlay').classList.add('active');document.getElementById('demo-banner').classList.add('hidden');return false;" style="color:var(--white);font-weight:600;text-decoration:none;background:var(--red);padding:3px 10px;border-radius:99px;font-size:11px;">Crear cuenta →</a>
+  </div>
 
   <!-- HEADER -->
   <header class="app-header glass-dark">

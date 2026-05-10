@@ -40,10 +40,19 @@ export function teardownApp() {
 
 export function getStickerState() { return stickerState; }
 
-// ── Firestore real-time sync ──────────────────────────────
-async function startFirestoreSync() {
-  const ref = doc(db, 'users', currentUser.uid, 'stickers', 'album');
+// ── Firestore real-time sync (or localStorage for demo) ───
+const IS_DEMO = () => currentUser?.uid === 'demo';
+const LS_KEY  = 'pannini_stickers';
 
+async function startFirestoreSync() {
+  if (IS_DEMO()) {
+    // Load from localStorage
+    try { stickerState = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { stickerState = {}; }
+    refreshAllUI();
+    return;
+  }
+
+  const ref = doc(db, 'users', currentUser.uid, 'stickers', 'album');
   firestoreUnsub = onSnapshot(ref, { includeMetadataChanges: true }, snap => {
     if (snap.exists()) {
       const data = snap.data();
@@ -59,17 +68,20 @@ async function startFirestoreSync() {
 }
 
 async function writeStickerCount(num, count) {
-  // Optimistic update first
   stickerState[String(num)] = count;
   refreshStickerCard(num);
   refreshProgressBars();
   refreshHeaderCount();
 
+  if (IS_DEMO()) {
+    localStorage.setItem(LS_KEY, JSON.stringify(stickerState));
+    return;
+  }
+
   const ref = doc(db, 'users', currentUser.uid, 'stickers', 'album');
   try {
     await updateDoc(ref, { [String(num)]: count, lastUpdated: serverTimestamp() });
   } catch {
-    // doc may not exist yet (new user)
     await setDoc(ref, { [String(num)]: count, lastUpdated: serverTimestamp() }, { merge: true });
   }
 }

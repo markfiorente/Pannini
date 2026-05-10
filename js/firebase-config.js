@@ -34,17 +34,26 @@ const firebaseConfig = {
   appId:             "YOUR_APP_ID"
 };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+// If credentials are still placeholder, run in demo mode (localStorage only)
+export const DEMO_MODE = firebaseConfig.apiKey === 'YOUR_API_KEY';
 
-// Enable offline persistence — data survives without internet
-enableIndexedDbPersistence(db).catch(err => {
-  if (err.code === 'failed-precondition') {
-    console.warn('[Firebase] Offline persistence unavailable: multiple tabs open');
-  } else if (err.code === 'unimplemented') {
-    console.warn('[Firebase] Offline persistence not supported in this browser');
-  }
-});
+let auth = null;
+let db   = null;
+
+if (!DEMO_MODE) {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db   = getFirestore(app);
+
+  enableIndexedDbPersistence(db).catch(err => {
+    if (err.code === 'failed-precondition') {
+      console.warn('[Firebase] Offline persistence unavailable: multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+      console.warn('[Firebase] Offline persistence not supported in this browser');
+    }
+  });
+} else {
+  console.info('[MarkFiorente] Modo Demo activo — los datos se guardan en localStorage.');
+}
 
 export { auth, db };

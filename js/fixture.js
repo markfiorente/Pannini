@@ -30,10 +30,17 @@ export function teardownFixtures() {
 
 export function getFixtureState() { return fixtureState; }
 
-// ── Firestore sync ────────────────────────────────────────
-async function startFirestoreSync() {
-  const ref = doc(db, 'users', currentUser.uid, 'fixtures', 'results');
+// ── Firestore sync (or localStorage for demo) ─────────────
+const IS_DEMO = () => currentUser?.uid === 'demo';
+const LS_KEY  = 'pannini_fixtures';
 
+async function startFirestoreSync() {
+  if (IS_DEMO()) {
+    try { fixtureState = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { fixtureState = {}; }
+    return;
+  }
+
+  const ref = doc(db, 'users', currentUser.uid, 'fixtures', 'results');
   firestoreUnsub = onSnapshot(ref, { includeMetadataChanges: true }, snap => {
     if (snap.exists()) {
       const data = snap.data();
@@ -51,23 +58,27 @@ async function writeMatchResult(matchId, homeScore, awayScore, played = true) {
   fixtureState[matchId] = { homeScore, awayScore, played };
   refreshMatchCard(matchId);
 
+  if (IS_DEMO()) {
+    localStorage.setItem(LS_KEY, JSON.stringify(fixtureState));
+    return;
+  }
+
   const ref = doc(db, 'users', currentUser.uid, 'fixtures', 'results');
   try {
-    await updateDoc(ref, {
-      [matchId]: { homeScore, awayScore, played },
-      lastUpdated: serverTimestamp(),
-    });
+    await updateDoc(ref, { [matchId]: { homeScore, awayScore, played }, lastUpdated: serverTimestamp() });
   } catch {
-    await setDoc(ref, {
-      [matchId]: { homeScore, awayScore, played },
-      lastUpdated: serverTimestamp(),
-    }, { merge: true });
+    await setDoc(ref, { [matchId]: { homeScore, awayScore, played }, lastUpdated: serverTimestamp() }, { merge: true });
   }
 }
 
 async function clearMatchResult(matchId) {
   fixtureState[matchId] = { played: false };
   refreshMatchCard(matchId);
+
+  if (IS_DEMO()) {
+    localStorage.setItem(LS_KEY, JSON.stringify(fixtureState));
+    return;
+  }
 
   const ref = doc(db, 'users', currentUser.uid, 'fixtures', 'results');
   try {

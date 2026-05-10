@@ -1,20 +1,21 @@
 // auth.js — Firebase Authentication orchestrator
 // Entry point for the entire SPA; controls auth overlay ↔ app shell
 
-import { auth } from './firebase-config.js';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  updateProfile,
-  onAuthStateChanged,
-  signOut,
-} from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
-
+import { auth, DEMO_MODE } from './firebase-config.js';
 import { initApp, teardownApp } from './app.js';
 import { initFixtures, teardownFixtures } from './fixture.js';
+
+// Only import Firebase Auth functions when not in demo mode
+let GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile,
+    onAuthStateChanged, signOut;
+
+if (!DEMO_MODE) {
+  const fbAuth = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js');
+  ({ GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword,
+     signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile,
+     onAuthStateChanged, signOut } = fbAuth);
+}
 
 // --- DOM references ---
 const authOverlay    = document.getElementById('auth-overlay');
@@ -23,21 +24,45 @@ const loadingOverlay = document.getElementById('loading-overlay');
 const authError      = document.getElementById('auth-error');
 
 // ========================================================
+// DEMO MODE — bypass Firebase entirely, use localStorage
+// ========================================================
+const DEMO_USER = { uid: 'demo', displayName: 'Demo', email: null, photoURL: null };
+
+async function enterDemoMode() {
+  showLoading(true);
+  authOverlay.classList.remove('active');
+  appShell.classList.remove('hidden');
+  showLoading(false);
+  await Promise.all([initApp(DEMO_USER), initFixtures(DEMO_USER)]);
+  // Show demo banner
+  const banner = document.getElementById('demo-banner');
+  if (banner) banner.classList.remove('hidden');
+}
+
+// ========================================================
 // AUTH STATE OBSERVER — single entry point for the entire app
 // ========================================================
-onAuthStateChanged(auth, async user => {
+if (DEMO_MODE) {
+  // No Firebase — go straight to demo
   showLoading(false);
-  if (user) {
-    authOverlay.classList.remove('active');
-    appShell.classList.remove('hidden');
-    await Promise.all([initApp(user), initFixtures(user)]);
-  } else {
-    authOverlay.classList.add('active');
-    appShell.classList.add('hidden');
-    teardownApp();
-    teardownFixtures();
-  }
-});
+  await enterDemoMode();
+} else {
+  onAuthStateChanged(auth, async user => {
+    showLoading(false);
+    if (user) {
+      authOverlay.classList.remove('active');
+      appShell.classList.remove('hidden');
+      const banner = document.getElementById('demo-banner');
+      if (banner) banner.classList.add('hidden');
+      await Promise.all([initApp(user), initFixtures(user)]);
+    } else {
+      authOverlay.classList.add('active');
+      appShell.classList.add('hidden');
+      teardownApp();
+      teardownFixtures();
+    }
+  });
+}
 
 // ========================================================
 // GOOGLE SIGN-IN
@@ -165,13 +190,21 @@ function friendlyError(code) {
 // ========================================================
 // WIRE UP ALL AUTH EVENTS
 // ========================================================
-document.getElementById('google-signin-btn')?.addEventListener('click',   signInWithGoogle);
-document.getElementById('google-register-btn')?.addEventListener('click', signInWithGoogle);
-document.getElementById('email-signin-form')?.addEventListener('submit',  handleEmailSignIn);
-document.getElementById('email-register-form')?.addEventListener('submit', handleEmailRegister);
-document.getElementById('forgot-password-link')?.addEventListener('click', handleForgotPassword);
-document.getElementById('signout-btn')?.addEventListener('click',         handleSignOut);
+if (!DEMO_MODE) {
+  document.getElementById('google-signin-btn')?.addEventListener('click',   signInWithGoogle);
+  document.getElementById('google-register-btn')?.addEventListener('click', signInWithGoogle);
+  document.getElementById('email-signin-form')?.addEventListener('submit',  handleEmailSignIn);
+  document.getElementById('email-register-form')?.addEventListener('submit', handleEmailRegister);
+  document.getElementById('forgot-password-link')?.addEventListener('click', handleForgotPassword);
+  initAuthTabs();
+}
 
-initAuthTabs();
+// Sign-out: always wired, behavior differs by mode
+document.getElementById('signout-btn')?.addEventListener('click', () => {
+  if (DEMO_MODE) { location.reload(); } else { handleSignOut(); }
+});
+
+// "Probar sin cuenta" button
+document.getElementById('try-demo-btn')?.addEventListener('click', enterDemoMode);
 
 export { handleSignOut };
