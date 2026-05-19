@@ -1,7 +1,10 @@
 // pdf.js — PDF export: sticker checklist + fixture bracket
 // Uses jsPDF (UMD global loaded via CDN in index.html)
 
-import { TEAMS, GROUPS, TEAM_ORDER, FIXTURES, PHASE_LABELS } from './data.js';
+import {
+  TEAMS, GROUPS, TEAM_ORDER, FIXTURES, PHASE_LABELS,
+  INTRO_STICKERS, MUSEUM_STICKERS, buildTeamStickers,
+} from './data.js';
 
 const NAVY      = [10, 14, 46];
 const NAVY_MID  = [17, 21, 64];
@@ -107,49 +110,29 @@ function addStickerIntroMuseumPage(pdf, stickerState) {
   fillRect(pdf, 0, 0, W, H, NAVY);
   pageHeader(pdf, 'INTRODUCCIÓN & MUSEO FIFA', W);
 
-  const stickers = [
-    ...Array.from({length: 9},  (_, i) => ({ num: i+1,  label: getStickerLabel(i+1),  section: 'INTRO' })),
-    ...Array.from({length: 11}, (_, i) => ({ num: i+10, label: getStickerLabel(i+10), section: 'MUSEO' })),
-  ];
-
   const cols = 5, rowH = 14, startY = 32, cellW = (W - 24) / cols;
 
-  // Section label: INTRO
-  pdf.setTextColor(...GOLD);
-  pdf.setFontSize(9);
-  pdf.text('INTRODUCCIÓN (Figuritas 1–9)', 12, startY - 2);
+  const renderGroup = (stickers, labelText, offsetY) => {
+    pdf.setTextColor(...GOLD); pdf.setFontSize(9);
+    pdf.text(labelText, 12, offsetY - 2);
+    stickers.forEach((s, idx) => {
+      const col = idx % cols, row = Math.floor(idx / cols);
+      const x = 12 + col * cellW, y = offsetY + row * rowH;
+      const count = stickerState[s.id] || 0;
+      const owned = count > 0;
+      fillRect(pdf, x, y, cellW - 2, rowH - 2, owned ? [0, 50, 25] : NAVY_MID);
+      pdf.setTextColor(...(owned ? GREEN : GRAY)); pdf.setFontSize(7);
+      pdf.text(`#${s.num}`, x + 1, y + 5);
+      pdf.setTextColor(...(owned ? WHITE : GRAY)); pdf.setFontSize(6);
+      pdf.text(s.name.substring(0, 22), x + 1, y + 10);
+      if (owned) { pdf.setTextColor(...GREEN); pdf.setFontSize(10); pdf.text('✓', x + cellW - 5, y + 8); }
+    });
+    return offsetY + (Math.ceil(stickers.length / cols)) * rowH + 6;
+  };
 
-  stickers.forEach((s, idx) => {
-    if (idx === 9) {
-      const sepY = startY + Math.ceil(9 / cols) * rowH + 4;
-      pdf.setTextColor(...GOLD);
-      pdf.setFontSize(9);
-      pdf.text('MUSEO FIFA (Figuritas 10–20)', 12, sepY - 2);
-    }
-    const sectionOffset = idx >= 9 ? 6 : 0;
-    const adjustedIdx   = idx >= 9 ? idx : idx;
-    const col = adjustedIdx % cols;
-    const row = Math.floor(adjustedIdx / cols);
-    const x = 12 + col * cellW;
-    const y = startY + row * rowH + sectionOffset;
-
-    const count = stickerState[String(s.num)] || 0;
-    const owned = count > 0;
-    fillRect(pdf, x, y, cellW - 2, rowH - 2, owned ? [0, 50, 25] : NAVY_MID);
-    pdf.setTextColor(...(owned ? GREEN : GRAY));
-    pdf.setFontSize(7);
-    pdf.text(`#${s.num}`, x + 1, y + 5);
-    pdf.setTextColor(...(owned ? WHITE : GRAY));
-    pdf.setFontSize(6);
-    const labelTrunc = s.label.substring(0, 22);
-    pdf.text(labelTrunc, x + 1, y + 10);
-    if (owned) {
-      pdf.setTextColor(...GREEN);
-      pdf.setFontSize(10);
-      pdf.text('✓', x + cellW - 5, y + 8);
-    }
-  });
-
+  let y = startY;
+  y = renderGroup(INTRO_STICKERS,   'INTRODUCCIÓN (Figuritas 1–9)',   y);
+  renderGroup(MUSEUM_STICKERS, 'MUSEO FIFA (Figuritas 1–11)', y);
   pageFooter(pdf, W, H);
 }
 
@@ -174,72 +157,40 @@ function addTeamPage(pdf, teamId, groupLetter, stickerState) {
   pdf.text(team.name.toUpperCase(), 12, 25);
 
   // Short + progress
-  const stNums = Array.from({length: 20}, (_, i) => team.stickerStart + i);
-  const owned  = stNums.filter(n => (stickerState[String(n)] || 0) > 0).length;
-  pdf.setTextColor(...WHITE);
-  pdf.setFontSize(10);
+  const teamStickers = buildTeamStickers(team);
+  const owned = teamStickers.filter(s => (stickerState[s.id] || 0) > 0).length;
+  pdf.setTextColor(...WHITE); pdf.setFontSize(10);
   pdf.text(`${team.shortName}`, W - 12, 20, { align: 'right' });
-  pdf.setTextColor(...(owned === 20 ? GREEN : GRAY));
-  pdf.setFontSize(9);
+  pdf.setTextColor(...(owned === 20 ? GREEN : GRAY)); pdf.setFontSize(9);
   pdf.text(`${owned}/20 figuritas`, W - 12, 27, { align: 'right' });
 
   // Sticker table header
   const tStartY = 36;
   const cols = { num: 12, type: 26, name: 50, owned: 165, dupes: 182 };
   fillRect(pdf, 12, tStartY - 6, W - 24, 8, NAVY_MID);
-  pdf.setTextColor(...GOLD);
-  pdf.setFontSize(7);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('#',        cols.num,   tStartY - 1);
-  pdf.text('Tipo',     cols.type,  tStartY - 1);
-  pdf.text('Nombre',   cols.name,  tStartY - 1);
-  pdf.text('Tengo',    cols.owned, tStartY - 1);
-  pdf.text('Rept.',    cols.dupes, tStartY - 1);
+  pdf.setTextColor(...GOLD); pdf.setFontSize(7); pdf.setFont('helvetica', 'bold');
+  pdf.text('#', cols.num, tStartY - 1); pdf.text('Tipo', cols.type, tStartY - 1);
+  pdf.text('Nombre', cols.name, tStartY - 1); pdf.text('Tengo', cols.owned, tStartY - 1);
+  pdf.text('Rept.', cols.dupes, tStartY - 1);
 
-  // Sticker rows
-  const types = [
-    'Escudo','Foto Equipo','Portero 1','Portero 2',
-    'Defensa 1','Defensa 2','Defensa 3','Defensa 4','Defensa 5',
-    'Mediocampista 1','Mediocampista 2','Mediocampista 3','Mediocampista 4','Mediocampista 5',
-    'Delantero 1','Delantero 2','Delantero 3','Delantero 4','Figura Estrella','Delantero 5',
-  ];
-  const typeShort = [
-    'ESCUDO','SQUAD','PORT','PORT',
-    'DEF','DEF','DEF','DEF','DEF',
-    'MED','MED','MED','MED','MED',
-    'DEL','DEL','DEL','DEL','⭐','DEL',
-  ];
+  const typeShortMap = { badge:'ESCUDO', squad:'EQUIPO', gk:'PORT', def:'DEF', mid:'MED', att:'DEL', star:'⭐', special:'ESP', foil:'FOIL' };
   const rowH = 11;
   pdf.setFont('helvetica', 'normal');
 
-  stNums.forEach((num, i) => {
-    const count  = stickerState[String(num)] || 0;
+  teamStickers.forEach((s, i) => {
+    const count   = stickerState[s.id] || 0;
     const isOwned = count > 0;
     const y = tStartY + 3 + i * rowH;
-
-    // Row bg
-    fillRect(pdf, 12, y - 7, W - 24, rowH - 1,
-      isOwned ? [0, 45, 20] : (i % 2 === 0 ? NAVY_MID : [14, 18, 55]));
-
-    pdf.setTextColor(...(isOwned ? GREEN : GRAY));
-    pdf.setFontSize(7);
-    pdf.text(String(num), cols.num, y - 1);
-
+    fillRect(pdf, 12, y - 7, W - 24, rowH - 1, isOwned ? [0, 45, 20] : (i % 2 === 0 ? NAVY_MID : [14, 18, 55]));
+    pdf.setTextColor(...(isOwned ? GREEN : GRAY)); pdf.setFontSize(7);
+    pdf.text(String(s.num), cols.num, y - 1);
     pdf.setTextColor(...GRAY);
-    pdf.text(typeShort[i], cols.type, y - 1);
-
+    pdf.text(typeShortMap[s.type] || s.type.toUpperCase(), cols.type, y - 1);
     pdf.setTextColor(...WHITE);
-    pdf.text(types[i], cols.name, y - 1);
-
-    pdf.setTextColor(...(isOwned ? GREEN : [80, 80, 80]));
-    pdf.setFontSize(9);
+    pdf.text(s.name.replace(`${team.name} – `, ''), cols.name, y - 1);
+    pdf.setTextColor(...(isOwned ? GREEN : [80, 80, 80])); pdf.setFontSize(9);
     pdf.text(isOwned ? '✓' : '□', cols.owned, y - 1);
-
-    if (count > 1) {
-      pdf.setTextColor(...GOLD);
-      pdf.setFontSize(7);
-      pdf.text(`+${count-1}`, cols.dupes, y - 1);
-    }
+    if (count > 1) { pdf.setTextColor(...GOLD); pdf.setFontSize(7); pdf.text(`+${count-1}`, cols.dupes, y - 1); }
   });
 
   pageFooter(pdf, W, H);
@@ -251,11 +202,19 @@ function addDuplicatesPage(pdf, stickerState) {
   fillRect(pdf, 0, 0, W, H, NAVY);
   pageHeader(pdf, 'FIGURITAS REPETIDAS', W);
 
+  // Collect all duplicates using team-based IDs
   const dupes = [];
-  for (let n = 1; n <= 980; n++) {
-    const count = stickerState[String(n)] || 0;
-    if (count > 1) dupes.push({ num: n, count });
-  }
+  const allIds = [
+    ...INTRO_STICKERS.map(s => ({ id: s.id, label: `Intro #${s.num}` })),
+    ...MUSEUM_STICKERS.map(s => ({ id: s.id, label: `Museo #${s.num}` })),
+    ...TEAM_ORDER.flatMap(teamId =>
+      buildTeamStickers(TEAMS[teamId]).map(s => ({ id: s.id, label: `${TEAMS[teamId].shortName} #${s.num}` }))
+    ),
+  ];
+  allIds.forEach(({ id, label }) => {
+    const count = stickerState[id] || 0;
+    if (count > 1) dupes.push({ label, count });
+  });
 
   if (dupes.length === 0) {
     pdf.setTextColor(...GRAY);
@@ -269,12 +228,12 @@ function addDuplicatesPage(pdf, stickerState) {
   let col = 0, y = 40;
 
   pdf.setFont('helvetica', 'normal');
-  dupes.forEach(({ num, count }) => {
+  dupes.forEach(({ label, count }) => {
     const x = 12 + col * cellW;
     fillRect(pdf, x, y - 9, cellW - 2, cellH, [55, 35, 5]);
     pdf.setTextColor(...GOLD);
     pdf.setFontSize(8);
-    pdf.text(`#${num}`, x + 2, y - 3);
+    pdf.text(label, x + 2, y - 3);
     pdf.setTextColor(...WHITE);
     pdf.setFontSize(7);
     pdf.text(`×${count-1} extra`, x + 2, y + 2);
@@ -453,19 +412,6 @@ function pageFooter(pdf, W, H) {
 
 function pageFooterLandscape(pdf, W, H) {
   pageFooter(pdf, W, H);
-}
-
-function getStickerLabel(num) {
-  const labels = {
-    1: 'Logo del Torneo', 2: 'Copa del Mundo', 3: 'Mapa de Sedes',
-    4: 'Logo EE.UU.', 5: 'Logo Canadá', 6: 'Logo México',
-    7: 'Mascota Oficial', 8: 'Balón Oficial', 9: 'Ceremonia Apertura',
-    10: 'Museo FIFA', 11: 'Uruguay 1930', 12: 'Italia 1934/38',
-    13: 'Brasil 1950', 14: 'Alemania 1954', 15: 'Brasil 1958/62',
-    16: 'Inglaterra 1966', 17: 'Brasil 1970', 18: 'Argentina 1978/86',
-    19: 'Alemania 1990/14', 20: 'Brasil 2002',
-  };
-  return labels[num] || `Figurita #${num}`;
 }
 
 function timestamp() {

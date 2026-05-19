@@ -1,16 +1,18 @@
 // app.js — Main application: sticker album, stats, Firestore sync
+// Sticker IDs use format: "mexico_1", "intro_3", "museum_7", etc.
 
 import { db } from './firebase-config.js';
 import {
   doc, setDoc, updateDoc, onSnapshot, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
 import {
-  TEAMS, GROUPS, TEAM_ORDER, ALBUM_DATA, STICKER_TYPES, TOTAL_STICKERS, getStickerInfo,
+  TEAMS, GROUPS, TEAM_ORDER, ALBUM_DATA, STICKER_TYPES, TOTAL_STICKERS,
+  INTRO_STICKERS, MUSEUM_STICKERS, buildTeamStickers,
 } from './data.js';
 
-// ── Module state ──────────────────────────────────────────
+// ── Module state ──────────────────────────────────────────────
 let currentUser    = null;
-let stickerState   = {};   // num (string) → count (0=missing, 1=owned, ≥2=duplicates)
+let stickerState   = {};   // stickerId → count (0=missing, 1=owned, ≥2=duplicates)
 let firestoreUnsub = null;
 let currentView    = 'album';
 let currentFilter  = 'all';
@@ -18,7 +20,7 @@ let albumRendered  = false;
 let longPressTimer = null;
 const LONG_PRESS_MS = 600;
 
-// ── Public API ────────────────────────────────────────────
+// ── Public API ────────────────────────────────────────────────
 export async function initApp(user) {
   currentUser = user;
   updateUserUI(user);
@@ -40,13 +42,12 @@ export function teardownApp() {
 
 export function getStickerState() { return stickerState; }
 
-// ── Firestore real-time sync (or localStorage for demo) ───
+// ── Firestore sync (or localStorage for demo) ─────────────────
 const IS_DEMO = () => currentUser?.uid === 'demo';
 const LS_KEY  = 'pannini_stickers';
 
 async function startFirestoreSync() {
   if (IS_DEMO()) {
-    // Load from localStorage
     try { stickerState = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { stickerState = {}; }
     refreshAllUI();
     return;
@@ -67,9 +68,9 @@ async function startFirestoreSync() {
   });
 }
 
-async function writeStickerCount(num, count) {
-  stickerState[String(num)] = count;
-  refreshStickerCard(num);
+async function writeStickerCount(stickerId, count) {
+  stickerState[stickerId] = count;
+  refreshStickerCard(stickerId);
   refreshProgressBars();
   refreshHeaderCount();
 
@@ -80,64 +81,55 @@ async function writeStickerCount(num, count) {
 
   const ref = doc(db, 'users', currentUser.uid, 'stickers', 'album');
   try {
-    await updateDoc(ref, { [String(num)]: count, lastUpdated: serverTimestamp() });
+    await updateDoc(ref, { [stickerId]: count, lastUpdated: serverTimestamp() });
   } catch {
-    await setDoc(ref, { [String(num)]: count, lastUpdated: serverTimestamp() }, { merge: true });
+    await setDoc(ref, { [stickerId]: count, lastUpdated: serverTimestamp() }, { merge: true });
   }
 }
 
-// ── Sticker interaction ───────────────────────────────────
-function handleStickerClick(num, e) {
+// ── Sticker interaction ───────────────────────────────────────
+function handleStickerClick(stickerId, displayNum, e) {
   e.preventDefault();
-  const count    = stickerState[String(num)] || 0;
+  const count = stickerState[stickerId] || 0;
   const isRightOrLong = e.type === 'contextmenu' || e._isLongPress;
   let newCount;
 
   if (isRightOrLong) {
-    // Right-click / long-press → add duplicate
     newCount = Math.max(1, count) + 1;
-    showToast(`#${num} — ${newCount - 1} repetida${newCount - 1 > 1 ? 's' : ''} 📦`);
+    showToast(`#${displayNum} — ${newCount - 1} repetida${newCount - 1 > 1 ? 's' : ''} 📦`);
   } else {
-    // Left-click → toggle owned/missing
     newCount = count > 0 ? 0 : 1;
-    showToast(newCount > 0 ? `#${num} ¡Conseguida! ✅` : `#${num} Marcada como faltante`);
+    showToast(newCount > 0 ? `#${displayNum} ¡Conseguida! ✅` : `#${displayNum} Marcada como faltante`);
   }
 
-  writeStickerCount(num, newCount);
-  animateStickerPop(num);
+  writeStickerCount(stickerId, newCount);
+  animateStickerPop(stickerId);
 }
 
-function attachStickerEvents(card, num) {
-  card.addEventListener('click', e => handleStickerClick(num, e));
+function attachStickerEvents(card, stickerId, displayNum) {
+  card.addEventListener('click',       e => handleStickerClick(stickerId, displayNum, e));
+  card.addEventListener('contextmenu', e => { e.preventDefault(); handleStickerClick(stickerId, displayNum, e); });
 
-  card.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    handleStickerClick(num, e);
-  });
-
-  // Mobile long-press
   card.addEventListener('touchstart', () => {
     longPressTimer = setTimeout(() => {
-      const fakeEvent = { type: 'longpress', _isLongPress: true, preventDefault: () => {} };
-      handleStickerClick(num, fakeEvent);
+      handleStickerClick(stickerId, displayNum, { type:'longpress', _isLongPress:true, preventDefault:()=>{} });
       navigator.vibrate?.(50);
     }, LONG_PRESS_MS);
   }, { passive: true });
-
   card.addEventListener('touchend',  () => clearTimeout(longPressTimer), { passive: true });
   card.addEventListener('touchmove', () => clearTimeout(longPressTimer), { passive: true });
 }
 
-function animateStickerPop(num) {
-  const card = document.querySelector(`.sticker-card[data-num="${num}"]`);
+function animateStickerPop(stickerId) {
+  const card = document.querySelector(`.sticker-card[data-id="${stickerId}"]`);
   if (!card) return;
   card.classList.remove('pop');
-  void card.offsetWidth; // reflow
+  void card.offsetWidth;
   card.classList.add('pop');
   card.addEventListener('animationend', () => card.classList.remove('pop'), { once: true });
 }
 
-// ── Album rendering ───────────────────────────────────────
+// ── Album rendering ───────────────────────────────────────────
 function renderAlbum() {
   renderSection('intro',  ALBUM_DATA.intro);
   renderSection('museum', ALBUM_DATA.museum);
@@ -189,9 +181,7 @@ function createTeamBlock(teamId) {
       <img
         src="https://flagcdn.com/w40/${team.flagCode}.png"
         srcset="https://flagcdn.com/w80/${team.flagCode}.png 2x"
-        class="team-flag"
-        alt="${team.name}"
-        loading="lazy"
+        class="team-flag" alt="${team.name}" loading="lazy"
         onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'flag-fb',textContent:'${team.shortName}'}))"
       >
       <div class="team-info">
@@ -214,52 +204,22 @@ function createTeamBlock(teamId) {
     const isCollapsed = grid.classList.toggle('collapsed');
     header.setAttribute('aria-expanded', String(!isCollapsed));
     header.querySelector('.collapse-icon').textContent = isCollapsed ? '▼' : '▲';
-
-    // Lazy-render stickers on first expand
     if (!isCollapsed && grid.childElementCount === 0) {
-      const stickers = buildTeamStickers(team);
-      stickers.forEach(s => grid.appendChild(createStickerCard(s)));
+      buildTeamStickers(team).forEach(s => grid.appendChild(createStickerCard(s)));
       applyCurrentFilter();
     }
   };
 
   header.addEventListener('click', toggle);
   header.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(); });
-
   return block;
 }
 
-function buildTeamStickers(team) {
-  const s = team.stickerStart;
-  const positions = [
-    { offset:  0, name: `${team.name} – Escudo`,           type: 'badge', foil: true  },
-    { offset:  1, name: `${team.name} – Foto de Equipo`,   type: 'squad', foil: false },
-    { offset:  2, name: `${team.name} – Portero 1`,        type: 'gk',    foil: false },
-    { offset:  3, name: `${team.name} – Portero 2`,        type: 'gk',    foil: false },
-    { offset:  4, name: `${team.name} – Defensa 1`,        type: 'def',   foil: false },
-    { offset:  5, name: `${team.name} – Defensa 2`,        type: 'def',   foil: false },
-    { offset:  6, name: `${team.name} – Defensa 3`,        type: 'def',   foil: false },
-    { offset:  7, name: `${team.name} – Defensa 4`,        type: 'def',   foil: false },
-    { offset:  8, name: `${team.name} – Defensa 5`,        type: 'def',   foil: false },
-    { offset:  9, name: `${team.name} – Mediocampista 1`,  type: 'mid',   foil: false },
-    { offset: 10, name: `${team.name} – Mediocampista 2`,  type: 'mid',   foil: false },
-    { offset: 11, name: `${team.name} – Mediocampista 3`,  type: 'mid',   foil: false },
-    { offset: 12, name: `${team.name} – Mediocampista 4`,  type: 'mid',   foil: false },
-    { offset: 13, name: `${team.name} – Mediocampista 5`,  type: 'mid',   foil: false },
-    { offset: 14, name: `${team.name} – Delantero 1`,      type: 'att',   foil: false },
-    { offset: 15, name: `${team.name} – Delantero 2`,      type: 'att',   foil: false },
-    { offset: 16, name: `${team.name} – Delantero 3`,      type: 'att',   foil: false },
-    { offset: 17, name: `${team.name} – Delantero 4`,      type: 'att',   foil: false },
-    { offset: 18, name: `${team.name} – Figura Estrella`,  type: 'star',  foil: true  },
-    { offset: 19, name: `${team.name} – Delantero 5`,      type: 'att',   foil: false },
-  ];
-  return positions.map(p => ({ ...p, num: s + p.offset }));
-}
-
 function createStickerCard(sticker) {
-  const card = document.createElement('div');
+  const card     = document.createElement('div');
   const typeInfo = STICKER_TYPES[sticker.type] || {};
   card.className = `sticker-card${sticker.foil ? ' foil' : ''}`;
+  card.dataset.id   = sticker.id;
   card.dataset.num  = sticker.num;
   card.dataset.type = sticker.type || '';
   card.title = `#${sticker.num} – ${sticker.name}`;
@@ -267,16 +227,16 @@ function createStickerCard(sticker) {
   card.innerHTML = `
     <span class="sc-num">#${sticker.num}</span>
     <span class="sc-icon">${typeInfo.icon || ''}</span>
-    <span class="sc-label">${typeInfo.label || sticker.type?.toUpperCase() || ''}</span>
-    <div class="sc-dup" id="dup-${sticker.num}"></div>
+    <span class="sc-label">${typeInfo.label || ''}</span>
+    <div class="sc-dup" id="dup-${sticker.id}"></div>
   `;
 
-  attachStickerEvents(card, sticker.num);
-  updateStickerCardState(card, sticker.num);
+  attachStickerEvents(card, sticker.id, sticker.num);
+  updateStickerCardState(card, sticker.id);
   return card;
 }
 
-// ── State refresh helpers ─────────────────────────────────
+// ── State refresh ─────────────────────────────────────────────
 function refreshAllUI() {
   refreshStickerCards();
   refreshProgressBars();
@@ -286,46 +246,45 @@ function refreshAllUI() {
 
 function refreshStickerCards() {
   document.querySelectorAll('.sticker-card').forEach(card => {
-    updateStickerCardState(card, parseInt(card.dataset.num));
+    updateStickerCardState(card, card.dataset.id);
   });
 }
 
-function refreshStickerCard(num) {
-  const card = document.querySelector(`.sticker-card[data-num="${num}"]`);
-  if (card) updateStickerCardState(card, num);
+function refreshStickerCard(stickerId) {
+  const card = document.querySelector(`.sticker-card[data-id="${stickerId}"]`);
+  if (card) updateStickerCardState(card, stickerId);
 }
 
-function updateStickerCardState(card, num) {
-  const count = stickerState[String(num)] || 0;
+function updateStickerCardState(card, stickerId) {
+  const count = stickerState[stickerId] || 0;
   card.classList.toggle('owned',     count === 1);
   card.classList.toggle('duplicate', count  >  1);
   card.classList.toggle('missing',   count === 0);
 
-  const dupEl = card.querySelector('.sc-dup');
+  const dupEl = document.getElementById(`dup-${stickerId}`);
   if (dupEl) {
-    dupEl.textContent = count > 1 ? `+${count - 1}` : '';
-    dupEl.style.display = count > 1 ? 'flex' : 'none';
+    dupEl.textContent    = count > 1 ? `+${count - 1}` : '';
+    dupEl.style.display  = count > 1 ? 'flex' : 'none';
   }
 }
 
 function refreshProgressBars() {
-  // Intro section
-  refreshSectionBar('intro', 1, 9);
-  // Museum section
-  refreshSectionBar('museum', 10, 20);
+  // Intro (9 stickers: intro_1 … intro_9)
+  refreshSectionBar('intro', 'intro', 9);
+  // Museum (11 stickers: museum_1 … museum_11)
+  refreshSectionBar('museum', 'museum', 11);
 
-  // Per team
+  // Per team (20 stickers: {teamId}_1 … {teamId}_20)
   TEAM_ORDER.forEach(teamId => {
-    const team  = TEAMS[teamId];
     let owned = 0;
-    for (let n = team.stickerStart; n < team.stickerStart + 20; n++) {
-      if ((stickerState[String(n)] || 0) > 0) owned++;
+    for (let n = 1; n <= 20; n++) {
+      if ((stickerState[`${teamId}_${n}`] || 0) > 0) owned++;
     }
-    const pct = Math.round((owned / 20) * 100);
+    const pct    = Math.round((owned / 20) * 100);
     const txtEl  = document.getElementById(`tprog-${teamId}`);
     const fillEl = document.getElementById(`tfill-${teamId}`);
-    if (txtEl)  txtEl.textContent     = `${owned}/20`;
-    if (fillEl) fillEl.style.width    = `${pct}%`;
+    if (txtEl)  txtEl.textContent  = `${owned}/20`;
+    if (fillEl) fillEl.style.width = `${pct}%`;
   });
 
   // Per group
@@ -333,12 +292,11 @@ function refreshProgressBars() {
     let owned = 0;
     const total = group.teams.length * 20;
     group.teams.forEach(teamId => {
-      const team = TEAMS[teamId];
-      for (let n = team.stickerStart; n < team.stickerStart + 20; n++) {
-        if ((stickerState[String(n)] || 0) > 0) owned++;
+      for (let n = 1; n <= 20; n++) {
+        if ((stickerState[`${teamId}_${n}`] || 0) > 0) owned++;
       }
     });
-    const pct = Math.round((owned / total) * 100);
+    const pct    = Math.round((owned / total) * 100);
     const pctEl  = document.getElementById(`gpct-${letter}`);
     const fillEl = document.getElementById(`gfill-${letter}`);
     if (pctEl)  pctEl.textContent  = `${pct}%`;
@@ -346,43 +304,43 @@ function refreshProgressBars() {
   });
 }
 
-function refreshSectionBar(id, from, to) {
+function refreshSectionBar(elId, prefix, total) {
   let owned = 0;
-  const total = to - from + 1;
-  for (let n = from; n <= to; n++) {
-    if ((stickerState[String(n)] || 0) > 0) owned++;
+  for (let n = 1; n <= total; n++) {
+    if ((stickerState[`${prefix}_${n}`] || 0) > 0) owned++;
   }
-  const pct = Math.round((owned / total) * 100);
-  const txtEl  = document.getElementById(`${id}-count`);
-  const fillEl = document.getElementById(`${id}-fill`);
+  const pct    = Math.round((owned / total) * 100);
+  const txtEl  = document.getElementById(`${elId}-count`);
+  const fillEl = document.getElementById(`${elId}-fill`);
   if (txtEl)  txtEl.textContent  = `${owned}/${total}`;
   if (fillEl) fillEl.style.width = `${pct}%`;
 }
 
 function refreshHeaderCount() {
-  let owned = 0;
-  for (let n = 1; n <= TOTAL_STICKERS; n++) {
-    if ((stickerState[String(n)] || 0) > 0) owned++;
-  }
+  const owned = Object.values(stickerState).filter(v => v > 0).length;
   const el = document.getElementById('header-owned');
   if (el) el.textContent = owned;
 }
 
-// ── Stats rendering ───────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────────────
 function renderStats() {
   let totalOwned = 0, totalDupes = 0, totalFoilsOwned = 0;
-  const foilNums = new Set([1, 2, 10]);
-  TEAM_ORDER.forEach(id => {
-    const s = TEAMS[id].stickerStart;
-    foilNums.add(s);      // badge
-    foilNums.add(s + 18); // star
+
+  // Count intro + museum
+  [...INTRO_STICKERS, ...MUSEUM_STICKERS].forEach(s => {
+    const count = stickerState[s.id] || 0;
+    if (count > 0) { totalOwned++; if (s.foil) totalFoilsOwned++; }
+    if (count > 1) totalDupes += count - 1;
   });
 
-  for (let n = 1; n <= TOTAL_STICKERS; n++) {
-    const count = stickerState[String(n)] || 0;
-    if (count > 0) { totalOwned++; if (foilNums.has(n)) totalFoilsOwned++; }
-    if (count > 1) totalDupes += count - 1;
-  }
+  // Count teams
+  TEAM_ORDER.forEach(teamId => {
+    buildTeamStickers(TEAMS[teamId]).forEach(s => {
+      const count = stickerState[s.id] || 0;
+      if (count > 0) { totalOwned++; if (s.foil) totalFoilsOwned++; }
+      if (count > 1) totalDupes += count - 1;
+    });
+  });
 
   const pct = Math.round((totalOwned / TOTAL_STICKERS) * 100);
   setText('stat-pct',        `${pct}%`);
@@ -391,12 +349,9 @@ function renderStats() {
   setText('stat-duplicates', totalDupes);
   setText('stat-foils',      totalFoilsOwned);
 
-  // Animate SVG ring: circumference = 2π × r(54) ≈ 339.3
+  // SVG ring: circumference = 2π × 54 ≈ 339.3
   const ring = document.getElementById('main-ring');
-  if (ring) {
-    const offset = 339.3 - (pct / 100) * 339.3;
-    ring.style.strokeDashoffset = offset;
-  }
+  if (ring) ring.style.strokeDashoffset = 339.3 - (pct / 100) * 339.3;
 
   renderGroupsTable();
   renderTeamStatsGrid();
@@ -406,23 +361,20 @@ function renderGroupsTable() {
   const tbody = document.getElementById('groups-table-body');
   if (!tbody) return;
   tbody.innerHTML = '';
-
   Object.entries(GROUPS).forEach(([letter, group]) => {
     let owned = 0;
     const total = group.teams.length * 20;
     group.teams.forEach(teamId => {
-      const team = TEAMS[teamId];
-      for (let n = team.stickerStart; n < team.stickerStart + 20; n++) {
-        if ((stickerState[String(n)] || 0) > 0) owned++;
+      for (let n = 1; n <= 20; n++) {
+        if ((stickerState[`${teamId}_${n}`] || 0) > 0) owned++;
       }
     });
     const pct = Math.round((owned / total) * 100);
-    const tr = document.createElement('tr');
+    const tr  = document.createElement('tr');
     tr.innerHTML = `
       <td><span class="group-badge-sm">G.${letter}</span></td>
       <td>${group.teams.map(id => TEAMS[id].shortName).join(', ')}</td>
-      <td>${owned}</td>
-      <td>${total}</td>
+      <td>${owned}</td><td>${total}</td>
       <td>
         <div class="table-bar-wrap">
           <div class="progress-bar sm" style="flex:1">
@@ -439,29 +391,21 @@ function renderGroupsTable() {
 function renderTeamStatsGrid() {
   const container = document.getElementById('team-stats-grid');
   if (!container) return;
-
-  // Sort by completion % descending
   const data = TEAM_ORDER.map(teamId => {
     const team = TEAMS[teamId];
     let owned = 0;
-    for (let n = team.stickerStart; n < team.stickerStart + 20; n++) {
-      if ((stickerState[String(n)] || 0) > 0) owned++;
+    for (let n = 1; n <= 20; n++) {
+      if ((stickerState[`${teamId}_${n}`] || 0) > 0) owned++;
     }
-    return { teamId, team, owned, pct: Math.round((owned / 20) * 100) };
+    return { team, owned, pct: Math.round((owned / 20) * 100) };
   });
   data.sort((a, b) => b.pct - a.pct);
-
   container.innerHTML = '';
   data.forEach(({ team, owned, pct }) => {
     const div = document.createElement('div');
     div.className = 'team-stat-card';
     div.innerHTML = `
-      <img
-        src="https://flagcdn.com/w40/${team.flagCode}.png"
-        class="ts-flag"
-        alt="${team.name}"
-        onerror="this.style.display='none'"
-      >
+      <img src="https://flagcdn.com/w40/${team.flagCode}.png" class="ts-flag" alt="${team.name}" onerror="this.style.display='none'">
       <div class="ts-info">
         <span class="ts-name">${team.name}</span>
         <div class="ts-bar-row">
@@ -476,7 +420,7 @@ function renderTeamStatsGrid() {
   });
 }
 
-// ── Navigation ────────────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────
 function setupNavigation() {
   document.querySelectorAll('[data-view]').forEach(btn => {
     btn.addEventListener('click', () => switchView(btn.dataset.view));
@@ -495,7 +439,7 @@ function switchView(viewName) {
   if (viewName === 'stats') renderStats();
 }
 
-// ── Album controls (search, filter, jump) ─────────────────
+// ── Album controls ────────────────────────────────────────────
 function setupAlbumControls() {
   const search = document.getElementById('sticker-search');
   if (search) search.addEventListener('input', debounce(handleSearch, 200));
@@ -514,8 +458,7 @@ function setupAlbumControls() {
     jumpGroup.addEventListener('change', e => {
       const val = e.target.value;
       if (!val) return;
-      const target = document.getElementById(val);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById(val)?.scrollIntoView({ behavior:'smooth', block:'start' });
       e.target.value = '';
     });
   }
@@ -524,16 +467,14 @@ function setupAlbumControls() {
 function handleSearch(e) {
   const query = e.target.value.trim().toLowerCase();
   document.querySelectorAll('.sticker-card').forEach(card => {
-    const num   = card.dataset.num;
-    const title = card.title.toLowerCase();
-    const match = !query || num.includes(query) || title.includes(query);
+    const match = !query || card.dataset.num?.includes(query) || card.title.toLowerCase().includes(query) || card.dataset.id?.includes(query);
     card.classList.toggle('filter-hidden', !match);
   });
 }
 
 function applyCurrentFilter() {
   document.querySelectorAll('.sticker-card').forEach(card => {
-    const count = stickerState[String(card.dataset.num)] || 0;
+    const count = stickerState[card.dataset.id] || 0;
     let visible = true;
     if (currentFilter === 'missing')   visible = count === 0;
     if (currentFilter === 'owned')     visible = count >= 1;
@@ -542,15 +483,12 @@ function applyCurrentFilter() {
   });
 }
 
-// ── User menu ─────────────────────────────────────────────
+// ── User menu ─────────────────────────────────────────────────
 function setupUserMenu() {
   const avatar   = document.getElementById('user-avatar');
   const dropdown = document.getElementById('user-dropdown');
   if (avatar && dropdown) {
-    avatar.addEventListener('click', e => {
-      e.stopPropagation();
-      dropdown.classList.toggle('open');
-    });
+    avatar.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
     document.addEventListener('click', () => dropdown.classList.remove('open'));
   }
 
@@ -565,25 +503,18 @@ function setupUserMenu() {
     dropdown?.classList.remove('open');
     showToast('Generando PDF de fixture... ⏳');
     const { exportFixturesPDF } = await import('./pdf.js');
-    // fixtureState comes from fixture.js
     const { getFixtureState } = await import('./fixture.js');
     await exportFixturesPDF(getFixtureState());
   });
 }
 
-// ── User UI ───────────────────────────────────────────────
+// ── User UI ───────────────────────────────────────────────────
 function updateUserUI(user) {
   const avatarEl = document.getElementById('user-avatar');
   const nameEl   = document.getElementById('user-display-name');
-
   if (nameEl) nameEl.textContent = user.displayName || user.email || 'Usuario';
-
   if (avatarEl) {
-    if (user.photoURL) {
-      avatarEl.src = user.photoURL;
-    } else {
-      avatarEl.src = generateInitialsAvatar(user);
-    }
+    avatarEl.src = user.photoURL || generateInitialsAvatar(user);
     avatarEl.alt = user.displayName || 'Usuario';
   }
 }
@@ -593,20 +524,16 @@ function generateInitialsAvatar(user) {
   canvas.width = canvas.height = 64;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#c8102e';
-  ctx.beginPath();
-  ctx.arc(32, 32, 32, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 26px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.beginPath(); ctx.arc(32, 32, 32, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 26px Arial';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const initials = (user.displayName || user.email || '?')
     .split(/[\s@]/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   ctx.fillText(initials, 32, 33);
   return canvas.toDataURL();
 }
 
-// ── Offline indicator ─────────────────────────────────────
+// ── Offline indicator ─────────────────────────────────────────
 function showOfflineIndicator(isOffline) {
   const el = document.getElementById('offline-dot');
   if (el) {
@@ -615,7 +542,7 @@ function showOfflineIndicator(isOffline) {
   }
 }
 
-// ── Toast ─────────────────────────────────────────────────
+// ── Toast ─────────────────────────────────────────────────────
 let _toastTimer;
 export function showToast(msg, duration = 2500) {
   const toast = document.getElementById('toast');
@@ -631,7 +558,7 @@ export function showToast(msg, duration = 2500) {
   }, duration);
 }
 
-// ── Utilities ─────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────────
 function setText(id, val) {
   const el = document.getElementById(id);
   if (el) el.textContent = val;
