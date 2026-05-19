@@ -1,1 +1,393 @@
-placeholder_to_be_replaced
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA World Cup 2026 — Tracker de Álbum Panini | MarkFiorente</title>
+  <meta name="description" content="Lleva el control de tu álbum Panini FIFA World Cup 2026. Marca tus figuritas, registra repetidas, ve estadísticas y exporta a PDF. Por MarkFiorente.">
+  <meta name="author" content="MarkFiorente">
+  <meta property="og:title" content="FIFA World Cup 2026 — Álbum Panini Tracker">
+  <meta property="og:description" content="Lleva el control de tu álbum Panini FIFA World Cup 2026 con MarkFiorente.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0a0e2e">
+  <link rel="canonical" href="https://markfiorente.com">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Flags CDN preconnect -->
+  <link rel="preconnect" href="https://flagcdn.com">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- jsPDF (UMD global, must load before ES modules) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ================================================================
+     LOADING OVERLAY
+     ================================================================ -->
+<div id="loading-overlay" class="overlay active">
+  <div class="spinner"></div>
+</div>
+
+<!-- ================================================================
+     AUTH OVERLAY
+     ================================================================ -->
+<div id="auth-overlay" class="overlay">
+  <div class="auth-card glass">
+
+    <!-- Brand logo -->
+    <div class="auth-logo">
+      <img src="assets/logo.svg" alt="MarkFiorente Logo">
+    </div>
+    <h1 class="auth-title">World Cup 2026</h1>
+    <p class="auth-subtitle">Tracker oficial del álbum Panini · Por MarkFiorente</p>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab-btn active" data-auth-tab="signin"   role="tab">Iniciar sesión</button>
+      <button class="auth-tab-btn"        data-auth-tab="register" role="tab">Registrarse</button>
+    </div>
+
+    <!-- SIGN IN Panel -->
+    <div class="auth-panel active" data-auth-panel="signin">
+      <!-- Google -->
+      <button id="google-signin-btn" class="btn-google" type="button" aria-label="Iniciar sesión con Google">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continuar con Google
+      </button>
+
+      <div class="auth-divider"><span>o</span></div>
+
+      <form id="email-signin-form" class="auth-form" novalidate>
+        <input type="email"    id="signin-email"    class="auth-input" placeholder="Email" required autocomplete="email">
+        <input type="password" id="signin-password" class="auth-input" placeholder="Contraseña" required autocomplete="current-password">
+        <button type="submit" class="btn-primary">Iniciar sesión</button>
+        <button type="button" id="forgot-password-link" class="forgot-link">¿Olvidaste tu contraseña?</button>
+      </form>
+    </div>
+
+    <!-- REGISTER Panel -->
+    <div class="auth-panel" data-auth-panel="register">
+      <button id="google-register-btn" class="btn-google" type="button" aria-label="Registrarse con Google">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continuar con Google
+      </button>
+
+      <div class="auth-divider"><span>o</span></div>
+
+      <form id="email-register-form" class="auth-form" novalidate>
+        <input type="text"     id="register-name"     class="auth-input" placeholder="Nombre o apodo" autocomplete="name">
+        <input type="email"    id="register-email"    class="auth-input" placeholder="Email" required autocomplete="email">
+        <input type="password" id="register-password" class="auth-input" placeholder="Contraseña (mín. 6 caracteres)" required autocomplete="new-password">
+        <button type="submit" class="btn-primary">Crear cuenta</button>
+      </form>
+    </div>
+
+    <!-- Error / Success message -->
+    <div id="auth-error" class="auth-error"></div>
+
+    <!-- Try without account -->
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--glass-border)">
+      <button id="try-demo-btn" style="background:none;border:none;color:var(--gray-400);font-size:12px;cursor:pointer;text-decoration:underline;transition:color .15s">
+        Probar sin cuenta →
+      </button>
+    </div>
+
+    <p class="auth-footer">
+      © 2026 <a href="https://markfiorente.com" target="_blank" rel="noopener">markfiorente.com</a>
+      — FIFA World Cup 2026 Sticker Tracker
+    </p>
+  </div>
+</div>
+
+<!-- ================================================================
+     MAIN APP (hidden until authenticated)
+     ================================================================ -->
+<div id="app" class="hidden">
+
+  <!-- Demo mode banner -->
+  <div id="demo-banner" class="hidden" style="background:linear-gradient(90deg,rgba(245,166,35,.18),rgba(200,16,46,.12));border-bottom:1px solid rgba(245,166,35,.3);padding:8px 16px;font-size:12px;color:var(--gold);display:flex;align-items:center;gap:12px;justify-content:center;">
+    <span>⚡ Modo Demo — los datos se guardan en este navegador.</span>
+    <a href="#" onclick="document.getElementById('auth-overlay').classList.add('active');document.getElementById('demo-banner').classList.add('hidden');return false;" style="color:var(--white);font-weight:600;text-decoration:none;background:var(--red);padding:3px 10px;border-radius:99px;font-size:11px;">Crear cuenta →</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header glass-dark">
+    <div class="header-logo">
+      <img src="assets/logo.svg" alt="MarkFiorente">
+      <span class="header-brand">MARK<span>FIORENTE</span></span>
+    </div>
+
+    <!-- Main navigation -->
+    <nav class="header-nav" role="navigation" aria-label="Main navigation">
+      <button class="nav-btn active" data-view="album"   aria-label="Álbum">
+        <span class="nav-icon">📖</span> <span>Álbum</span>
+      </button>
+      <button class="nav-btn" data-view="stats"   aria-label="Estadísticas">
+        <span class="nav-icon">📊</span> <span>Stats</span>
+      </button>
+      <button class="nav-btn" data-view="fixtures" aria-label="Fixture">
+        <span class="nav-icon">⚽</span> <span>Fixture</span>
+      </button>
+    </nav>
+
+    <!-- Right side -->
+    <div class="header-right">
+      <!-- Offline indicator -->
+      <div id="offline-dot" title="Modo offline" aria-label="Sin conexión"></div>
+
+      <!-- Progress pill -->
+      <div class="progress-pill" title="Figuritas conseguidas">
+        <span class="owned-count" id="header-owned">0</span>
+        <span>/ 980</span>
+      </div>
+
+      <!-- User avatar + dropdown -->
+      <div class="user-menu" role="navigation" aria-label="User menu">
+        <img id="user-avatar" src="" alt="Usuario" class="user-avatar" tabindex="0" role="button" aria-haspopup="true">
+        <div id="user-dropdown" class="user-dropdown glass" role="menu">
+          <div class="dropdown-header" id="user-display-name">Usuario</div>
+          <button id="export-stickers-btn" class="dropdown-btn" role="menuitem">
+            📄 Exportar figuritas PDF
+          </button>
+          <button id="export-fixtures-btn" class="dropdown-btn" role="menuitem">
+            📋 Exportar fixture PDF
+          </button>
+          <div class="dropdown-divider"></div>
+          <button id="signout-btn" class="dropdown-btn danger" role="menuitem">
+            🚪 Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==============================================================
+       VIEW: ALBUM
+       ============================================================== -->
+  <main id="view-album" class="view active" role="main" aria-label="Album view">
+
+    <!-- Controls bar -->
+    <div class="album-controls glass-dark">
+      <input
+        type="search"
+        id="sticker-search"
+        placeholder="🔍 Buscar por # o nombre..."
+        aria-label="Buscar figurita"
+      >
+
+      <div class="filter-group" role="group" aria-label="Filtrar figuritas">
+        <button class="filter-btn active" data-filter="all"       aria-pressed="true">Todas</button>
+        <button class="filter-btn"        data-filter="missing"   aria-pressed="false">Me faltan</button>
+        <button class="filter-btn"        data-filter="owned"     aria-pressed="false">Tengo</button>
+        <button class="filter-btn"        data-filter="duplicate" aria-pressed="false">Repetidas</button>
+      </div>
+
+      <select id="jump-group" aria-label="Ir a sección">
+        <option value="">Ir a sección...</option>
+        <option value="section-intro">Introducción</option>
+        <option value="section-museum">Museo FIFA</option>
+        <option value="section-group-A">Grupo A</option>
+        <option value="section-group-B">Grupo B</option>
+        <option value="section-group-C">Grupo C</option>
+        <option value="section-group-D">Grupo D</option>
+        <option value="section-group-E">Grupo E</option>
+        <option value="section-group-F">Grupo F</option>
+        <option value="section-group-G">Grupo G</option>
+        <option value="section-group-H">Grupo H</option>
+        <option value="section-group-I">Grupo I</option>
+        <option value="section-group-J">Grupo J</option>
+        <option value="section-group-K">Grupo K</option>
+        <option value="section-group-L">Grupo L</option>
+      </select>
+    </div>
+
+    <!-- Tip bar -->
+    <div style="font-size:11px;color:var(--gray-400);margin-bottom:12px;padding:0 4px;">
+      💡 <strong>Click</strong> = marcar tengo/falta &nbsp;·&nbsp;
+      <strong>Click derecho</strong> = añadir repetida &nbsp;·&nbsp;
+      <strong>Mantener (móvil)</strong> = repetida
+    </div>
+
+    <!-- INTRO section -->
+    <section class="album-section" id="section-intro">
+      <div class="section-header">
+        <h2 class="section-title">Introducción</h2>
+        <div class="section-progress">
+          <span class="section-count" id="intro-count">0/9</span>
+          <div class="progress-bar"><div class="progress-fill" id="intro-fill"></div></div>
+        </div>
+      </div>
+      <div class="section-grid-wrap">
+        <div class="sticker-grid" id="grid-intro" style="border-radius:0 0 var(--r-md) var(--r-md)"></div>
+      </div>
+    </section>
+
+    <!-- MUSEUM section -->
+    <section class="album-section" id="section-museum">
+      <div class="section-header">
+        <h2 class="section-title">Museo FIFA</h2>
+        <div class="section-progress">
+          <span class="section-count" id="museum-count">0/11</span>
+          <div class="progress-bar"><div class="progress-fill" id="museum-fill"></div></div>
+        </div>
+      </div>
+      <div class="section-grid-wrap">
+        <div class="sticker-grid" id="grid-museum" style="border-radius:0 0 var(--r-md) var(--r-md)"></div>
+      </div>
+    </section>
+
+    <!-- GROUP SECTIONS — injected by app.js -->
+    <div id="album-groups"></div>
+  </main>
+
+  <!-- ==============================================================
+       VIEW: STATS
+       ============================================================== -->
+  <main id="view-stats" class="view hidden" role="main" aria-label="Statistics view">
+
+    <!-- Hero ring + stat cards -->
+    <div class="stats-hero glass">
+      <div class="ring-wrap" aria-label="Progreso total del álbum">
+        <svg class="stat-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#00a651"/>
+              <stop offset="100%" stop-color="#f5a623"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg"   cx="60" cy="60" r="54"/>
+          <circle class="ring-fill" id="main-ring" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="ring-label">
+          <span id="stat-pct">0%</span>
+          <span class="ring-sub">Completo</span>
+        </div>
+      </div>
+
+      <div class="stat-cards-row">
+        <div class="stat-card glass">
+          <span class="stat-val" id="stat-owned">0</span>
+          <span class="stat-lbl">Tengo ✅</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-val" id="stat-missing">980</span>
+          <span class="stat-lbl">Faltan ❌</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-val" id="stat-duplicates">0</span>
+          <span class="stat-lbl">Repetidas 📦</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-val" id="stat-foils">0</span>
+          <span class="stat-lbl">Foils ⭐</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- By group table -->
+    <div class="stats-section glass">
+      <h3>Por Grupo</h3>
+      <table class="stats-table" aria-label="Progreso por grupo">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Equipos</th>
+            <th>Tengo</th>
+            <th>Total</th>
+            <th>Progreso</th>
+          </tr>
+        </thead>
+        <tbody id="groups-table-body">
+          <!-- Filled by app.js -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- By team -->
+    <div class="stats-section glass">
+      <h3>Por Equipo</h3>
+      <div id="team-stats-grid" aria-label="Progreso por equipo">
+        <!-- Filled by app.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ==============================================================
+       VIEW: FIXTURE
+       ============================================================== -->
+  <main id="view-fixtures" class="view hidden" role="main" aria-label="Fixture view">
+
+    <!-- Phase tabs -->
+    <div class="fixture-tabs" role="tablist" aria-label="Fases del torneo">
+      <button data-phase="group" class="active" role="tab" aria-selected="true">Fase de Grupos</button>
+      <button data-phase="r32"              role="tab">Ronda de 32</button>
+      <button data-phase="r16"              role="tab">Octavos</button>
+      <button data-phase="qf"               role="tab">Cuartos</button>
+      <button data-phase="sf"               role="tab">Semis</button>
+      <button data-phase="third"            role="tab">3° Lugar</button>
+      <button data-phase="final"            role="tab">Final</button>
+    </div>
+
+    <!-- Group stage fixture -->
+    <div id="fixtures-group" aria-label="Partidos de fase de grupos">
+      <!-- Filled by fixture.js -->
+    </div>
+
+    <!-- Knockout bracket -->
+    <div id="fixtures-knockout" class="hidden" aria-label="Bracket eliminatorio">
+      <!-- Filled by fixture.js on demand -->
+    </div>
+  </main>
+
+</div><!-- /#app -->
+
+<!-- ================================================================
+     SCORE MODAL
+     ================================================================ -->
+<div id="score-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-phase-label">
+  <div class="modal-card glass">
+    <p id="modal-phase-label" class="modal-phase-label"></p>
+    <div id="modal-match-header"></div>
+    <div class="score-inputs">
+      <input type="number" id="home-score-input" class="score-input" min="0" max="99" placeholder="0" aria-label="Goles local">
+      <span class="score-sep-modal">–</span>
+      <input type="number" id="away-score-input" class="score-input" min="0" max="99" placeholder="0" aria-label="Goles visitante">
+    </div>
+    <div class="modal-actions">
+      <button id="save-score-btn"  class="btn-save">💾 Guardar resultado</button>
+      <div class="modal-secondary-row">
+        <button id="clear-score-btn"  class="btn-clear">🗑 Borrar</button>
+        <button id="cancel-score-btn" class="btn-cancel">✕ Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     TOAST
+     ================================================================ -->
+<div id="toast" class="hidden" role="status" aria-live="polite"></div>
+
+<!-- ================================================================
+     APP ENTRY POINT (ES Module — imports auth.js which chains everything)
+     ================================================================ -->
+<script type="module" src="js/auth.js"></script>
+
+</body>
+</html>
