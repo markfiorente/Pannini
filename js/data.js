@@ -13,7 +13,7 @@ export const STICKER_TYPES = {
   att:     { label: 'DEL',       icon: '⚽', foil: false },
   star:    { label: 'ESTRELLA',  icon: '⭐', foil: true  },
   special: { label: 'ESPECIAL',  icon: '✨', foil: false },
-  foil:    { label: 'FOIL',      icon: '🌟', foil: true  },
+  foil:    { label: 'BRILLANTE', icon: '✨', foil: true  },
 };
 
 // ── Team order (same as sticker album sequence) ───────────────
