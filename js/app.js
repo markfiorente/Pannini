@@ -7,7 +7,9 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
 import {
   TEAMS, GROUPS, TEAM_ORDER, ALBUM_DATA, STICKER_TYPES, TOTAL_STICKERS,
-  INTRO_STICKERS, MUSEUM_STICKERS, buildTeamStickers,
+  INTRO_STICKERS, MUSEUM_STICKERS,
+  ESPECIALES_STICKERS, BALON_STICKERS, HISTORIA_STICKERS, COCA_COLA_STICKERS,
+  buildTeamStickers,
 } from './data.js';
 
 // ── Module state ──────────────────────────────────────────────
@@ -131,8 +133,10 @@ function animateStickerPop(stickerId) {
 
 // ── Album rendering ───────────────────────────────────────────
 function renderAlbum() {
-  renderSection('intro',  ALBUM_DATA.intro);
-  renderSection('museum', ALBUM_DATA.museum);
+  renderSection('especiales', ALBUM_DATA.especiales);
+  renderSection('balon',      ALBUM_DATA.balon);
+  renderSection('historia',   ALBUM_DATA.historia);
+  renderSection('coca-cola',  ALBUM_DATA.coca_cola);
   renderGroupSections();
 }
 
@@ -269,10 +273,14 @@ function updateStickerCardState(card, stickerId) {
 }
 
 function refreshProgressBars() {
-  // Intro (9 stickers: intro_1 … intro_9)
-  refreshSectionBar('intro', 'intro', 9);
-  // Museum (11 stickers: museum_1 … museum_11)
-  refreshSectionBar('museum', 'museum', 11);
+  // Especiales (#00-04: intro_1..5)
+  refreshSectionBar('especiales', 'intro', 1, 5);
+  // Balón y Países (#05-08: intro_6..9)
+  refreshSectionBar('balon', 'intro', 6, 9);
+  // Historia (#09-19: museum_1..11)
+  refreshSectionBar('historia', 'museum', 1, 11);
+  // Coca-Cola (coca_cola_1..14)
+  refreshSectionBar('coca-cola', 'coca_cola', 1, 14);
 
   // Per team (20 stickers: {teamId}_1 … {teamId}_20)
   TEAM_ORDER.forEach(teamId => {
@@ -304,11 +312,12 @@ function refreshProgressBars() {
   });
 }
 
-function refreshSectionBar(elId, prefix, total) {
+function refreshSectionBar(elId, prefix, startN, endN) {
   let owned = 0;
-  for (let n = 1; n <= total; n++) {
+  for (let n = startN; n <= endN; n++) {
     if ((stickerState[`${prefix}_${n}`] || 0) > 0) owned++;
   }
+  const total  = endN - startN + 1;
   const pct    = Math.round((owned / total) * 100);
   const txtEl  = document.getElementById(`${elId}-count`);
   const fillEl = document.getElementById(`${elId}-fill`);
@@ -326,8 +335,8 @@ function refreshHeaderCount() {
 function renderStats() {
   let totalOwned = 0, totalDupes = 0, totalFoilsOwned = 0;
 
-  // Count intro + museum
-  [...INTRO_STICKERS, ...MUSEUM_STICKERS].forEach(s => {
+  // Count all special sections
+  [...ESPECIALES_STICKERS, ...BALON_STICKERS, ...HISTORIA_STICKERS, ...COCA_COLA_STICKERS].forEach(s => {
     const count = stickerState[s.id] || 0;
     if (count > 0) { totalOwned++; if (s.foil) totalFoilsOwned++; }
     if (count > 1) totalDupes += count - 1;

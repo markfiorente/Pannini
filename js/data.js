@@ -14,6 +14,8 @@ export const STICKER_TYPES = {
   star:    { label: 'ESTRELLA',  icon: '⭐', foil: true  },
   special: { label: 'ESPECIAL',  icon: '✨', foil: false },
   foil:    { label: 'BRILLANTE', icon: '✨', foil: true  },
+  balon:   { label: 'BALÓN',     icon: '⚽', foil: false },
+  cc:      { label: 'COCA-COLA', icon: '🥤', foil: false },
 };
 
 // ── Team order (same as sticker album sequence) ───────────────
@@ -144,39 +146,71 @@ export function buildTeamStickers(team) {
 }
 
 // ── Intro stickers (local numbering 1–9) ──────────────────────
-export const INTRO_STICKERS = [
-  { num:1, id:'intro_1', name:'Logo del Torneo',       type:'foil',    foil:true  },
-  { num:2, id:'intro_2', name:'Copa del Mundo FIFA',   type:'foil',    foil:true  },
-  { num:3, id:'intro_3', name:'Mapa de Sedes',         type:'special', foil:false },
-  { num:4, id:'intro_4', name:'Logo Sede EE.UU.',      type:'special', foil:false },
-  { num:5, id:'intro_5', name:'Logo Sede Canadá',      type:'special', foil:false },
-  { num:6, id:'intro_6', name:'Logo Sede México',      type:'special', foil:false },
-  { num:7, id:'intro_7', name:'Mascota Oficial',       type:'special', foil:false },
-  { num:8, id:'intro_8', name:'Balón Oficial',         type:'special', foil:false },
-  { num:9, id:'intro_9', name:'Ceremonia de Apertura', type:'special', foil:false },
+// Especiales: #00–04 (album sticker numbers 0-4 → internal intro_1..5)
+export const ESPECIALES_STICKERS = [
+  { num:0, id:'intro_1', name:'Pannini',            type:'foil',    foil:true  },
+  { num:1, id:'intro_2', name:'Copa del Mundo',     type:'foil',    foil:true  },
+  { num:2, id:'intro_3', name:'Copa del Mundo',     type:'foil',    foil:true  },
+  { num:3, id:'intro_4', name:'Mascota Oficial',    type:'special', foil:false },
+  { num:4, id:'intro_5', name:'Slogan Oficial',     type:'special', foil:false },
 ];
 
+// Balón y Países: #05–08 (album sticker numbers 5-8 → internal intro_6..9)
+export const BALON_STICKERS = [
+  { num:5, id:'intro_6', name:'Balón Oficial',      type:'balon',   foil:false },
+  { num:6, id:'intro_7', name:'Sede Canadá',        type:'balon',   foil:false },
+  { num:7, id:'intro_8', name:'Sede México',        type:'balon',   foil:false },
+  { num:8, id:'intro_9', name:'Sede EE.UU.',        type:'balon',   foil:false },
+];
+
+// Backward compat alias used by stats / PDF
+export const INTRO_STICKERS = [...ESPECIALES_STICKERS, ...BALON_STICKERS];
+
 // ── Museo FIFA stickers (local numbering 1–11) ────────────────
-export const MUSEUM_STICKERS = [
-  { num: 1, id:'museum_1',  name:'Museo FIFA',            type:'foil',    foil:true  },
-  { num: 2, id:'museum_2',  name:'Uruguay 1930',          type:'special', foil:false },
-  { num: 3, id:'museum_3',  name:'Italia 1934 & 1938',    type:'special', foil:false },
-  { num: 4, id:'museum_4',  name:'Brasil 1950',           type:'special', foil:false },
-  { num: 5, id:'museum_5',  name:'Alemania Occ. 1954',    type:'special', foil:false },
-  { num: 6, id:'museum_6',  name:'Brasil 1958 & 1962',    type:'special', foil:false },
-  { num: 7, id:'museum_7',  name:'Inglaterra 1966',       type:'special', foil:false },
-  { num: 8, id:'museum_8',  name:'Brasil 1970',           type:'special', foil:false },
-  { num: 9, id:'museum_9',  name:'Argentina 1978 & 1986', type:'special', foil:false },
-  { num:10, id:'museum_10', name:'Alemania 1990 & 2014',  type:'special', foil:false },
-  { num:11, id:'museum_11', name:'Brasil 2002',           type:'special', foil:false },
+// Historia: #09–19 (album sticker numbers 9-19 → internal museum_1..11)
+export const HISTORIA_STICKERS = [
+  { num: 9, id:'museum_1',  name:'Historia del Fútbol',      type:'foil',    foil:true  },
+  { num:10, id:'museum_2',  name:'Uruguay 1930 · Italia 1934',  type:'special', foil:false },
+  { num:11, id:'museum_3',  name:'Italia 1938 · Uruguay 1950',  type:'special', foil:false },
+  { num:12, id:'museum_4',  name:'Alem. Occ. 1954 · Brasil 1958', type:'special', foil:false },
+  { num:13, id:'museum_5',  name:'Brasil 1962 · Inglaterra 1966', type:'special', foil:false },
+  { num:14, id:'museum_6',  name:'Brasil 1970 · Alem. Occ. 1974', type:'special', foil:false },
+  { num:15, id:'museum_7',  name:'Argentina 1978 · Italia 1982',  type:'special', foil:false },
+  { num:16, id:'museum_8',  name:'Argentina 1986 · Alemania 1990',type:'special', foil:false },
+  { num:17, id:'museum_9',  name:'Brasil 1994 · Francia 1998',   type:'special', foil:false },
+  { num:18, id:'museum_10', name:'Brasil 2002 · Italia 2006',    type:'special', foil:false },
+  { num:19, id:'museum_11', name:'España 2010 · Alem. 2014 · Francia 2018 · Argentina 2022', type:'special', foil:false },
+];
+
+// Backward compat alias
+export const MUSEUM_STICKERS = HISTORIA_STICKERS;
+
+// Coca-Cola section: CC1–CC14 (coca_cola_1..14)
+export const COCA_COLA_STICKERS = [
+  { num: 1, id:'coca_cola_1',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 2, id:'coca_cola_2',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 3, id:'coca_cola_3',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 4, id:'coca_cola_4',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 5, id:'coca_cola_5',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 6, id:'coca_cola_6',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 7, id:'coca_cola_7',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 8, id:'coca_cola_8',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num: 9, id:'coca_cola_9',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num:10, id:'coca_cola_10', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num:11, id:'coca_cola_11', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num:12, id:'coca_cola_12', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num:13, id:'coca_cola_13', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
+  { num:14, id:'coca_cola_14', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
 ];
 
 // ── Album data ────────────────────────────────────────────────
 function buildAlbumData() {
   return {
-    intro:  INTRO_STICKERS,
-    museum: MUSEUM_STICKERS,
-    teams:  TEAM_ORDER.map(id => ({ teamId:id, stickers:buildTeamStickers(TEAMS[id]) })),
+    especiales: ESPECIALES_STICKERS,
+    balon:      BALON_STICKERS,
+    historia:   HISTORIA_STICKERS,
+    coca_cola:  COCA_COLA_STICKERS,
+    teams:      TEAM_ORDER.map(id => ({ teamId:id, stickers:buildTeamStickers(TEAMS[id]) })),
   };
 }
 export const ALBUM_DATA = buildAlbumData();
@@ -185,7 +219,8 @@ export const ALBUM_DATA = buildAlbumData();
 const _stickerMap = new Map();
 (function _buildMap() {
   INTRO_STICKERS.forEach(s => _stickerMap.set(s.id, s));
-  MUSEUM_STICKERS.forEach(s => _stickerMap.set(s.id, s));
+  HISTORIA_STICKERS.forEach(s => _stickerMap.set(s.id, s));
+  COCA_COLA_STICKERS.forEach(s => _stickerMap.set(s.id, s));
   TEAM_ORDER.forEach(teamId => {
     buildTeamStickers(TEAMS[teamId]).forEach(s => _stickerMap.set(s.id, { ...s, teamId }));
   });
@@ -201,7 +236,8 @@ export function getTeamStickers(teamId) {
 
 // ── Totals ────────────────────────────────────────────────────
 // 9 intro + 11 museum + 48 teams × 20 = 980
-export const TOTAL_STICKERS = 980;
+// 9 especiales+balon + 11 historia + 14 coca-cola + 48×20 teams = 994
+export const TOTAL_STICKERS = 994;
 
 // ── Venues ────────────────────────────────────────────────────
 const VENUES = {

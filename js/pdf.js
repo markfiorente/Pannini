@@ -1,6 +1,7 @@
 // pdf.js — Fiorente brand PDF export (modern card layout)
 import {
   TEAMS, GROUPS, TEAM_ORDER, FIXTURES, PHASE_LABELS,
+  ESPECIALES_STICKERS, BALON_STICKERS, HISTORIA_STICKERS, COCA_COLA_STICKERS,
   INTRO_STICKERS, MUSEUM_STICKERS, buildTeamStickers,
 } from './data.js';
 
@@ -33,7 +34,7 @@ export async function exportStickersPDF(stickerState) {
   addCoverPage(pdf, 'Mi Colección', `${totalOwned} / 980 laminitas`, false);
 
   pdf.addPage();
-  addIntroMuseumPage(pdf, stickerState);
+  addSpecialSectionsPage(pdf, stickerState);
 
   Object.keys(GROUPS).forEach(letter => {
     pdf.addPage();
@@ -124,23 +125,20 @@ function addCoverPage(pdf, title, subtitle, isLandscape) {
   );
 }
 
-// ─── Intro + Museum page ───────────────────────────────────────
-function addIntroMuseumPage(pdf, stickerState) {
+// ─── Special sections page (Especiales + Balón + Historia + CC) ─
+function addSpecialSectionsPage(pdf, stickerState) {
   const W = 210, H = 297;
   fillRect(pdf, 0, 0, W, H, BG);
-
-  addPageHeader(pdf, 'INTRO & MUSEO FIFA', W, null, null, null);
+  addPageHeader(pdf, 'SECCIONES ESPECIALES', W, null, null, null);
 
   const MX = 10;
   let curY = 26;
+  const gap = 5;
 
-  // Intro section
-  curY = renderStickerSection(pdf, 'INTRODUCCIÓN', INTRO_STICKERS, MX, curY, W - 2 * MX, stickerState, 4, 32);
-
-  curY += 6;
-
-  // Museum section
-  renderStickerSection(pdf, 'MUSEO FIFA', MUSEUM_STICKERS, MX, curY, W - 2 * MX, stickerState, 4, 32);
+  curY = renderStickerSection(pdf, 'ESPECIALES  #00–04', ESPECIALES_STICKERS, MX, curY, W - 2*MX, stickerState, 5, 28) + gap;
+  curY = renderStickerSection(pdf, 'BALÓN Y PAÍSES  #05–08', BALON_STICKERS,  MX, curY, W - 2*MX, stickerState, 4, 28) + gap;
+  curY = renderStickerSection(pdf, 'HISTORIA  #09–19', HISTORIA_STICKERS,      MX, curY, W - 2*MX, stickerState, 4, 28) + gap;
+  renderStickerSection(pdf, 'COCA-COLA  CC1–CC14', COCA_COLA_STICKERS,         MX, curY, W - 2*MX, stickerState, 7, 24);
 
   addPageFooter(pdf, W, H);
 }
@@ -651,8 +649,10 @@ function fillRect(pdf, x, y, w, h, color) {
 
 function collectAllStickers() {
   return [
-    ...INTRO_STICKERS,
-    ...MUSEUM_STICKERS,
+    ...ESPECIALES_STICKERS,
+    ...BALON_STICKERS,
+    ...HISTORIA_STICKERS,
+    ...COCA_COLA_STICKERS,
     ...TEAM_ORDER.flatMap(id => buildTeamStickers(TEAMS[id])),
   ];
 }
