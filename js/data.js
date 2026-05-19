@@ -169,17 +169,17 @@ export const INTRO_STICKERS = [...ESPECIALES_STICKERS, ...BALON_STICKERS];
 // ── Museo FIFA stickers (local numbering 1–11) ────────────────
 // Historia: #09–19 (album sticker numbers 9-19 → internal museum_1..11)
 export const HISTORIA_STICKERS = [
-  { num: 9, id:'museum_1',  name:'Historia del Fútbol',      type:'foil',    foil:true  },
-  { num:10, id:'museum_2',  name:'Uruguay 1930 · Italia 1934',  type:'special', foil:false },
-  { num:11, id:'museum_3',  name:'Italia 1938 · Uruguay 1950',  type:'special', foil:false },
-  { num:12, id:'museum_4',  name:'Alem. Occ. 1954 · Brasil 1958', type:'special', foil:false },
-  { num:13, id:'museum_5',  name:'Brasil 1962 · Inglaterra 1966', type:'special', foil:false },
-  { num:14, id:'museum_6',  name:'Brasil 1970 · Alem. Occ. 1974', type:'special', foil:false },
-  { num:15, id:'museum_7',  name:'Argentina 1978 · Italia 1982',  type:'special', foil:false },
-  { num:16, id:'museum_8',  name:'Argentina 1986 · Alemania 1990',type:'special', foil:false },
-  { num:17, id:'museum_9',  name:'Brasil 1994 · Francia 1998',   type:'special', foil:false },
-  { num:18, id:'museum_10', name:'Brasil 2002 · Italia 2006',    type:'special', foil:false },
-  { num:19, id:'museum_11', name:'España 2010 · Alem. 2014 · Francia 2018 · Argentina 2022', type:'special', foil:false },
+  { num: 9, id:'museum_1',  name:'FWC - 09', type:'foil',    foil:true  },
+  { num:10, id:'museum_2',  name:'FWC - 10', type:'special', foil:false },
+  { num:11, id:'museum_3',  name:'FWC - 11', type:'special', foil:false },
+  { num:12, id:'museum_4',  name:'FWC - 12', type:'special', foil:false },
+  { num:13, id:'museum_5',  name:'FWC - 13', type:'special', foil:false },
+  { num:14, id:'museum_6',  name:'FWC - 14', type:'special', foil:false },
+  { num:15, id:'museum_7',  name:'FWC - 15', type:'special', foil:false },
+  { num:16, id:'museum_8',  name:'FWC - 16', type:'special', foil:false },
+  { num:17, id:'museum_9',  name:'FWC - 17', type:'special', foil:false },
+  { num:18, id:'museum_10', name:'FWC - 18', type:'special', foil:false },
+  { num:19, id:'museum_11', name:'FWC - 19', type:'special', foil:false },
 ];
 
 // Backward compat alias
