@@ -24,14 +24,13 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.0/fireba
 import { getAuth } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js';
 import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js';
 
-// *** REPLACE WITH YOUR FIREBASE PROJECT CREDENTIALS ***
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyBLaASG6M7RMbm3ftfQNndEKb6M8JEcaVY",
+  authDomain:        "pannini-2026.firebaseapp.com",
+  projectId:         "pannini-2026",
+  storageBucket:     "pannini-2026.firebasestorage.app",
+  messagingSenderId: "948919602790",
+  appId:             "1:948919602790:web:928d9a1075876f4e1d67a7"
 };
 
 // If credentials are still placeholder, run in demo mode (localStorage only)
