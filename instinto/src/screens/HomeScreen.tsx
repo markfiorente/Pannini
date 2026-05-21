@@ -73,6 +73,21 @@ export default function HomeScreen({ navigation }: Props) {
             />
           ))}
 
+          <View style={styles.challengeSection}>
+            <TouchableOpacity
+              style={styles.challengeCreateBtn}
+              onPress={() => navigation.navigate('ChallengeSetup')}
+            >
+              <Text style={styles.challengeCreateText}>⚔️ Crear un reto</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.challengeJoinBtn}
+              onPress={() => navigation.navigate('ChallengeJoin')}
+            >
+              <Text style={styles.challengeJoinText}>🎯 Tengo un reto</Text>
+            </TouchableOpacity>
+          </View>
+
           <Pressable style={styles.profileBtn} onPress={() => navigation.navigate('Profile')}>
             <Text style={styles.profileBtnText}>🧠 Mi perfil de Instinto</Text>
           </Pressable>
@@ -110,8 +125,20 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border,
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, letterSpacing: 1,
   },
+  challengeSection: { marginTop: 24, gap: 10 },
+  challengeCreateBtn: {
+    backgroundColor: Colors.text, borderRadius: 50,
+    padding: 16, alignItems: 'center',
+  },
+  challengeCreateText: { color: Colors.bg, fontSize: 15, fontWeight: '900', letterSpacing: 1 },
+  challengeJoinBtn: {
+    backgroundColor: Colors.surface, borderRadius: 50,
+    padding: 16, alignItems: 'center',
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  challengeJoinText: { color: Colors.text, fontSize: 15, fontWeight: '700' },
   profileBtn: {
-    marginTop: 24, backgroundColor: Colors.surface, borderRadius: 50,
+    marginTop: 10, backgroundColor: Colors.surface, borderRadius: 50,
     padding: 16, alignItems: 'center',
   },
   profileBtnText: { color: Colors.text, fontSize: 15, fontWeight: '700' },

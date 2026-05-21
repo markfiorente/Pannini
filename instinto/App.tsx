@@ -14,6 +14,11 @@ import TempoGame from './src/screens/games/TempoGame';
 import CodeGame from './src/screens/games/CodeGame';
 import ResultScreen from './src/screens/ResultScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import ChallengeSetupScreen from './src/screens/ChallengeSetupScreen';
+import ChallengeShareScreen from './src/screens/ChallengeShareScreen';
+import ChallengeJoinScreen from './src/screens/ChallengeJoinScreen';
+import ChallengePreviewScreen from './src/screens/ChallengePreviewScreen';
+import ChallengeResultScreen from './src/screens/ChallengeResultScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,6 +40,11 @@ export default function App() {
           <Stack.Screen name="CodeGame" component={CodeGame} />
           <Stack.Screen name="Result" component={ResultScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="ChallengeSetup" component={ChallengeSetupScreen} />
+          <Stack.Screen name="ChallengeShare" component={ChallengeShareScreen} />
+          <Stack.Screen name="ChallengeJoin" component={ChallengeJoinScreen} />
+          <Stack.Screen name="ChallengePreview" component={ChallengePreviewScreen} />
+          <Stack.Screen name="ChallengeResult" component={ChallengeResultScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

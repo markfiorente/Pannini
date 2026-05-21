@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types';
 import { Colors, gameConfig } from '../../theme';
 import { saveScore } from '../../storage/scores';
+import { recordScore } from '../../lib/challengeState';
 
 type Phase = 'idle' | 'waiting' | 'ready' | 'tooEarly' | 'done';
 
@@ -20,7 +21,8 @@ const color = gameConfig.reflex.color;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ReflexGame'>;
 
-export default function ReflexGame({ navigation }: Props) {
+export default function ReflexGame({ navigation, route }: Props) {
+  const challengeMode = route.params?.challengeMode ?? false;
   const [phase, setPhase] = useState<Phase>('idle');
   const [round, setRound] = useState(0);
   const [times, setTimes] = useState<number[]>([]);
@@ -66,7 +68,12 @@ export default function ReflexGame({ navigation }: Props) {
       if (nextRound >= ROUNDS) {
         const avg = Math.round(nextTimes.reduce((a, b) => a + b, 0) / nextTimes.length);
         const isNew = await saveScore('reflex', avg);
-        navigation.replace('Result', { game: 'reflex', score: avg, isNewRecord: isNew });
+        if (challengeMode) {
+          recordScore('reflex', avg);
+          navigation.replace('TempoGame', { challengeMode: true });
+        } else {
+          navigation.replace('Result', { game: 'reflex', score: avg, isNewRecord: isNew });
+        }
       } else {
         setPhase('done');
       }

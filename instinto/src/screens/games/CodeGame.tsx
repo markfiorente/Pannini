@@ -5,6 +5,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types';
 import { Colors, gameConfig } from '../../theme';
 import { saveScore } from '../../storage/scores';
+import { recordScore, getChallengeId, getPlayerBName, getScores, getChallengeData } from '../../lib/challengeState';
+import { submitChallengeResult } from '../../lib/challenges';
 
 const color = gameConfig.code.color;
 const BUTTON_COLORS = ['#FF1744', '#00E676', '#00B0FF', '#FFD600'];
@@ -18,7 +20,8 @@ function randSeq(len: number): number[] {
   return Array.from({ length: len }, () => Math.floor(Math.random() * 4));
 }
 
-export default function CodeGame({ navigation }: Props) {
+export default function CodeGame({ navigation, route }: Props) {
+  const challengeMode = route.params?.challengeMode ?? false;
   const [phase, setPhase] = useState<Phase>('intro');
   const [sequence, setSequence] = useState<number[]>(randSeq(2));
   const [level, setLevel] = useState(1);
@@ -66,7 +69,21 @@ export default function CodeGame({ navigation }: Props) {
       const finalScore = level - 1 + sequence.length - 2;
       setTimeout(async () => {
         const isNew = await saveScore('code', finalScore);
-        navigation.replace('Result', { game: 'code', score: finalScore, isNewRecord: isNew });
+        if (challengeMode) {
+          recordScore('code', finalScore);
+          const cId = getChallengeId();
+          const bName = getPlayerBName();
+          const sc = getScores();
+          const cData = getChallengeData();
+          if (cId && bName && cData) {
+            try {
+              await submitChallengeResult(cId, cData, bName, sc.reflex, sc.tempo, finalScore);
+            } catch { /* navigate anyway */ }
+            navigation.replace('ChallengeResult', { challengeId: cId });
+          }
+        } else {
+          navigation.replace('Result', { game: 'code', score: finalScore, isNewRecord: isNew });
+        }
       }, 1500);
       return;
     }

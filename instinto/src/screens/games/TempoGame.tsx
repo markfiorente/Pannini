@@ -7,6 +7,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types';
 import { Colors, gameConfig } from '../../theme';
 import { saveScore } from '../../storage/scores';
+import { recordScore } from '../../lib/challengeState';
 
 const TARGETS = [3000, 5000, 7000, 10000, 15000]; // ms
 const ROUNDS = 3;
@@ -19,7 +20,8 @@ function randomTarget() {
   return TARGETS[Math.floor(Math.random() * TARGETS.length)];
 }
 
-export default function TempoGame({ navigation }: Props) {
+export default function TempoGame({ navigation, route }: Props) {
+  const challengeMode = route.params?.challengeMode ?? false;
   const [phase, setPhase] = useState<Phase>('intro');
   const [round, setRound] = useState(1);
   const [target, setTarget] = useState(randomTarget);
@@ -46,7 +48,12 @@ export default function TempoGame({ navigation }: Props) {
       const avg = Math.round(nextDevs.reduce((a, b) => a + b, 0) / nextDevs.length);
       setTimeout(async () => {
         const isNew = await saveScore('tempo', avg);
-        navigation.replace('Result', { game: 'tempo', score: avg, isNewRecord: isNew });
+        if (challengeMode) {
+          recordScore('tempo', avg);
+          navigation.replace('CodeGame', { challengeMode: true });
+        } else {
+          navigation.replace('Result', { game: 'tempo', score: avg, isNewRecord: isNew });
+        }
       }, 1800);
     }
   }, [target, deviations, round, navigation]);
