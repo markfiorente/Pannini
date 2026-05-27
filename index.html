@@ -154,7 +154,7 @@
       <!-- Progress pill -->
       <div class="progress-pill" title="Figuritas conseguidas">
         <span class="owned-count" id="header-owned">0</span>
-        <span>/ 980</span>
+        <span>/ 994</span>
       </div>
 
       <!-- User avatar + dropdown -->
@@ -164,6 +164,9 @@
           <div class="dropdown-header" id="user-display-name">Usuario</div>
           <button id="export-stickers-btn" class="dropdown-btn" role="menuitem">
             📄 Exportar figuritas PDF
+          </button>
+          <button id="export-missing-btn" class="dropdown-btn" role="menuitem">
+            🔍 Exportar faltantes PDF
           </button>
           <button id="export-fixtures-btn" class="dropdown-btn" role="menuitem">
             📋 Exportar fixture PDF
@@ -196,6 +199,8 @@
         <button class="filter-btn"        data-filter="missing"   aria-pressed="false">Me faltan</button>
         <button class="filter-btn"        data-filter="owned"     aria-pressed="false">Tengo</button>
         <button class="filter-btn"        data-filter="duplicate" aria-pressed="false">Repetidas</button>
+        <button class="filter-btn"        data-filter="badge"     aria-pressed="false">Escudos</button>
+        <button class="filter-btn"        data-filter="squad"     aria-pressed="false">Equipos</button>
       </div>
 
       <select id="jump-group" aria-label="Ir a sección">
@@ -316,7 +321,7 @@
           <span class="stat-lbl">Tengo ✅</span>
         </div>
         <div class="stat-card glass">
-          <span class="stat-val" id="stat-missing">980</span>
+          <span class="stat-val" id="stat-missing">994</span>
           <span class="stat-lbl">Faltan ❌</span>
         </div>
         <div class="stat-card glass">

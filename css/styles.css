@@ -633,12 +633,19 @@ a:hover { text-decoration: underline; }
   transition: filter var(--t-fast);
 }
 .sc-label {
-  font-size: 7px;
+  font-size: 6.5px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: var(--gray-400);
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.1;
+  text-align: center;
+  max-width: calc(var(--sticker-size) - 6px);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 /* States */
@@ -660,16 +667,18 @@ a:hover { text-decoration: underline; }
 .sticker-card.duplicate .sc-icon  { filter: none; }
 .sticker-card.duplicate .sc-label { color: rgba(255,107,0,.85); }
 
-/* Foil sticker */
+/* Foil sticker — missing state: amber border + warm tint so it's clearly different from a regular missing */
 .sticker-card.foil {
-  border-color: rgba(255,107,0,.45);
+  border-color: rgba(255,140,53,.65);
   background: linear-gradient(
     135deg,
-    rgba(255,107,0,.06) 0%,
-    rgba(255,107,0,.08) 50%,
-    rgba(255,107,0,.06) 100%
+    rgba(255,107,0,.13) 0%,
+    rgba(255,140,53,.10) 50%,
+    rgba(255,107,0,.13) 100%
   );
 }
+.sticker-card.foil .sc-num   { color: rgba(255,140,53,.7); }
+.sticker-card.foil .sc-label { color: rgba(255,140,53,.65); }
 .sticker-card.foil.owned {
   border-color: var(--gold-light);
   background: linear-gradient(135deg, rgba(255,107,0,.3) 0%, rgba(255,140,53,.2) 50%, rgba(255,107,0,.3) 100%);

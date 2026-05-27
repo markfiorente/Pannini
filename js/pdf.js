@@ -31,7 +31,7 @@ export async function exportStickersPDF(stickerState) {
   const totalOwned  = allStickers.filter(s => (stickerState[s.id] || 0) > 0).length;
   const totalDupes  = allStickers.filter(s => (stickerState[s.id] || 0) > 1).length;
 
-  addCoverPage(pdf, 'Mi Colección', `${totalOwned} / 980 laminitas`, false);
+  addCoverPage(pdf, 'Mi Colección', `${totalOwned} / 994 laminitas`, false);
 
   pdf.addPage();
   addSpecialSectionsPage(pdf, stickerState);
@@ -47,6 +47,14 @@ export async function exportStickersPDF(stickerState) {
   }
 
   pdf.save(`wc2026-coleccion-${timestamp()}.pdf`);
+}
+
+export async function exportMissingPDF(stickerState) {
+  if (!window.jspdf) { alert('jsPDF no disponible.'); return; }
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  addMissingStickersPage(pdf, stickerState);
+  pdf.save(`wc2026-faltantes-${timestamp()}.pdf`);
 }
 
 export async function exportFixturesPDF(fixtureState) {
@@ -397,6 +405,160 @@ function addDuplicatesPage(pdf, stickerState) {
         curY = 28;
       }
     }
+  });
+
+  addPageFooter(pdf, W, H);
+}
+
+// ─── Missing stickers: single printable page (portrait) ───────
+function addMissingStickersPage(pdf, stickerState) {
+  const W = 210, H = 297;
+  const MX = 10;
+
+  fillRect(pdf, 0, 0, W, H, BG);
+  fillRect(pdf, 0, 0, W, 2, ORANGE);
+  fillRect(pdf, 0, H - 2, W, 2, ORANGE);
+
+  // ── Title & stats block
+  fillRect(pdf, 0, 2, W, 16, SURFACE);
+  fillRect(pdf, 0, 2, 3, 16, ORANGE);
+
+  const allStickers  = collectAllStickers();
+  const totalMissing = allStickers.filter(s => (stickerState[s.id] || 0) === 0).length;
+  const totalOwned   = allStickers.length - totalMissing;
+
+  pdf.setTextColor(...ORANGE);
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('FALTANTES', MX, 12);
+
+  pdf.setTextColor(...GRAY_LT);
+  pdf.setFontSize(7);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(`${totalOwned} / ${allStickers.length} conseguidas  ·  ${totalMissing} faltantes`, MX + 42, 10);
+  pdf.setTextColor(...GRAY);
+  pdf.setFontSize(6);
+  pdf.text(`${new Date().toLocaleDateString('es')}  ·  markfiorente.com`, W - MX, 15, { align: 'right' });
+
+  let curY = 21;
+
+  // ── Special sections row (4 columns)
+  const specialSecs = [
+    { label: 'ESPECIALES #00–04', stickers: ESPECIALES_STICKERS, ccPrefix: false },
+    { label: 'BALÓN Y PAÍSES #05–08', stickers: BALON_STICKERS, ccPrefix: false },
+    { label: 'HISTORIA #09–19', stickers: HISTORIA_STICKERS, ccPrefix: false },
+    { label: 'COCA-COLA CC1–CC14', stickers: COCA_COLA_STICKERS, ccPrefix: true },
+  ];
+  const SW = (W - 2 * MX) / specialSecs.length;
+
+  specialSecs.forEach(({ label, stickers, ccPrefix }, si) => {
+    const sx = MX + si * SW;
+    const blockH = 14;
+    fillRect(pdf, sx, curY, SW - 1, blockH, SURFACE);
+    fillRect(pdf, sx, curY, 2, blockH, ORANGE);
+
+    pdf.setTextColor(...ORANGE);
+    pdf.setFontSize(5);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(label, sx + 3, curY + 4);
+
+    const missingStickers = stickers.filter(s => (stickerState[s.id] || 0) === 0);
+    const missingCount = missingStickers.length;
+
+    if (missingCount === 0) {
+      pdf.setTextColor(...GREEN);
+      pdf.setFontSize(6);
+      pdf.text('COMPLETO ✓', sx + 3, curY + 10);
+    } else {
+      const numList = missingStickers.map(s => ccPrefix ? `CC${s.num}` : String(s.num)).join(', ');
+      pdf.setTextColor(...WHITE);
+      pdf.setFontSize(5.5);
+      pdf.setFont('helvetica', 'normal');
+      const lines = pdf.splitTextToSize(numList, SW - 5);
+      pdf.text(lines[0], sx + 3, curY + 9);
+      if (lines[1]) pdf.text(lines[1], sx + 3, curY + 13);
+    }
+    pdf.setTextColor(...GRAY);
+    pdf.setFontSize(5);
+    pdf.text(`${stickers.length - missingCount}/${stickers.length}`, sx + SW - 2, curY + 4, { align: 'right' });
+  });
+
+  curY += 17;
+
+  // ── Groups grid: 3 columns × 4 rows
+  const GCOLS   = 3;
+  const GW      = (W - 2 * MX) / GCOLS;
+  const G_GAP   = 2;
+  const GH      = 7;   // group header height
+  const TH      = 9;   // team row height
+  const BLOCK_H = GH + 4 * TH + G_GAP;
+
+  Object.keys(GROUPS).forEach((letter, gi) => {
+    const col   = gi % GCOLS;
+    const row   = Math.floor(gi / GCOLS);
+    const gx    = MX + col * GW;
+    const gy    = curY + row * BLOCK_H;
+    const group = GROUPS[letter];
+
+    // Group header
+    fillRect(pdf, gx, gy, GW - 1, GH, SURF2);
+    fillRect(pdf, gx, gy, 2, GH, ORANGE);
+    pdf.setTextColor(...ORANGE);
+    pdf.setFontSize(6.5);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(`GRUPO ${letter}`, gx + 3, gy + 5);
+
+    // Group completion count
+    let gOwned = 0;
+    group.teams.forEach(tid => { for (let n = 1; n <= 20; n++) { if ((stickerState[`${tid}_${n}`] || 0) > 0) gOwned++; } });
+    const gTotal = group.teams.length * 20;
+    pdf.setTextColor(...(gOwned === gTotal ? GREEN : GRAY));
+    pdf.setFontSize(5.5);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${gOwned}/${gTotal}`, gx + GW - 2, gy + 5, { align: 'right' });
+
+    // Team rows
+    group.teams.forEach((teamId, ti) => {
+      const team    = TEAMS[teamId];
+      const ty      = gy + GH + ti * TH;
+      const rowBg   = ti % 2 === 0 ? SURFACE : BG;
+      fillRect(pdf, gx, ty, GW - 1, TH, rowBg);
+
+      const missing = [];
+      for (let n = 1; n <= 20; n++) {
+        if ((stickerState[`${teamId}_${n}`] || 0) === 0) missing.push(n);
+      }
+      const ownedCnt = 20 - missing.length;
+      const complete = missing.length === 0;
+
+      // Team short name
+      pdf.setTextColor(...(complete ? GREEN : WHITE));
+      pdf.setFontSize(6);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(team.shortName, gx + 3, ty + 4);
+
+      if (complete) {
+        pdf.setTextColor(...GREEN);
+        pdf.setFontSize(5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('completo', gx + 3, ty + 7.5);
+      } else {
+        // Owned count small
+        pdf.setTextColor(...GRAY);
+        pdf.setFontSize(5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${ownedCnt}/20`, gx + 3, ty + 7.5);
+
+        // Missing numbers right-aligned
+        const numsStr = missing.join(',');
+        const availW  = GW - 1 - 18;
+        pdf.setTextColor(...GRAY_LT);
+        pdf.setFontSize(5);
+        const numLines = pdf.splitTextToSize(numsStr, availW);
+        pdf.text(numLines[0], gx + GW - 2, ty + 4, { align: 'right' });
+        if (numLines[1]) pdf.text(numLines[1], gx + GW - 2, ty + 7.5, { align: 'right' });
+      }
+    });
   });
 
   addPageFooter(pdf, W, H);

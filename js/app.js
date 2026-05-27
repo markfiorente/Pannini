@@ -99,9 +99,18 @@ function handleStickerClick(stickerId, displayNum, e) {
   if (isRightOrLong) {
     newCount = Math.max(1, count) + 1;
     showToast(`#${displayNum} — ${newCount - 1} repetida${newCount - 1 > 1 ? 's' : ''} 📦`);
+  } else if (count === 0) {
+    newCount = 1;
+    showToast(`#${displayNum} ¡Conseguida! ✅`);
+  } else if (count === 1) {
+    newCount = 0;
+    showToast(`#${displayNum} Marcada como faltante`);
   } else {
-    newCount = count > 0 ? 0 : 1;
-    showToast(newCount > 0 ? `#${displayNum} ¡Conseguida! ✅` : `#${displayNum} Marcada como faltante`);
+    newCount = count - 1;
+    const dupes = newCount - 1;
+    showToast(dupes > 0
+      ? `#${displayNum} — ${dupes} repetida${dupes > 1 ? 's' : ''} 📦`
+      : `#${displayNum} Sin repetidas`);
   }
 
   writeStickerCount(stickerId, newCount);
@@ -228,10 +237,13 @@ function createStickerCard(sticker) {
   card.dataset.type = sticker.type || '';
   card.title = `#${sticker.num} – ${sticker.name}`;
 
+  // For special sections use the short name; for team stickers use the type label
+  const displayLabel = sticker.shortName || typeInfo.label || '';
+
   card.innerHTML = `
     <span class="sc-num">#${sticker.num}</span>
     <span class="sc-icon">${typeInfo.icon || ''}</span>
-    <span class="sc-label">${typeInfo.label || ''}</span>
+    <span class="sc-label">${displayLabel}</span>
     <div class="sc-dup" id="dup-${sticker.id}"></div>
   `;
 
@@ -488,6 +500,8 @@ function applyCurrentFilter() {
     if (currentFilter === 'missing')   visible = count === 0;
     if (currentFilter === 'owned')     visible = count >= 1;
     if (currentFilter === 'duplicate') visible = count > 1;
+    if (currentFilter === 'badge')     visible = card.dataset.type === 'badge';
+    if (currentFilter === 'squad')     visible = card.dataset.type === 'squad';
     card.classList.toggle('filter-hidden', !visible);
   });
 }
@@ -506,6 +520,13 @@ function setupUserMenu() {
     showToast('Generando PDF de figuritas... ⏳');
     const { exportStickersPDF } = await import('./pdf.js');
     await exportStickersPDF(stickerState);
+  });
+
+  document.getElementById('export-missing-btn')?.addEventListener('click', async () => {
+    dropdown?.classList.remove('open');
+    showToast('Generando PDF de faltantes... ⏳');
+    const { exportMissingPDF } = await import('./pdf.js');
+    await exportMissingPDF(stickerState);
   });
 
   document.getElementById('export-fixtures-btn')?.addEventListener('click', async () => {
