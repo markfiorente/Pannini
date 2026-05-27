@@ -145,40 +145,40 @@ export function buildTeamStickers(team) {
 }
 
 // ── Intro stickers (local numbering 1–9) ──────────────────────
-// Especiales: #00–04 (album sticker numbers 0-4 → internal intro_1..5)
+// Especiales: #00–04 — TODAS brillantes
 export const ESPECIALES_STICKERS = [
-  { num:0, id:'intro_1', name:'00. Logo Panini',                    shortName:'Logo Panini',   type:'foil',    foil:true  },
-  { num:1, id:'intro_2', name:'FWC1. Trofeo (Parte Superior)',      shortName:'Trofeo Sup.',   type:'foil',    foil:true  },
-  { num:2, id:'intro_3', name:'FWC2. Trofeo (Parte Inferior)',      shortName:'Trofeo Inf.',   type:'foil',    foil:true  },
-  { num:3, id:'intro_4', name:'FWC3. Mascotas Maple, Zayu, Clutch', shortName:'Mascotas',      type:'special', foil:false },
-  { num:4, id:'intro_5', name:'FWC4. We Are 26',                    shortName:'We Are 26',     type:'special', foil:false },
+  { num:0, id:'intro_1', name:'00. Logo Panini',                    shortName:'Logo Panini',   type:'foil', foil:true },
+  { num:1, id:'intro_2', name:'FWC1. Trofeo (Parte Superior)',      shortName:'Trofeo Sup.',   type:'foil', foil:true },
+  { num:2, id:'intro_3', name:'FWC2. Trofeo (Parte Inferior)',      shortName:'Trofeo Inf.',   type:'foil', foil:true },
+  { num:3, id:'intro_4', name:'FWC3. Mascotas Maple, Zayu, Clutch', shortName:'Mascotas',      type:'foil', foil:true },
+  { num:4, id:'intro_5', name:'FWC4. We Are 26',                    shortName:'We Are 26',     type:'foil', foil:true },
 ];
 
-// Balón y Países: #05–08 (album sticker numbers 5-8 → internal intro_6..9)
+// Balón y Países: #05–08 — TODAS brillantes
 export const BALON_STICKERS = [
-  { num:5, id:'intro_6', name:'FWC5. Pelota Oficial',  shortName:'Pelota',       type:'balon', foil:false },
-  { num:6, id:'intro_7', name:'FWC6. Logo FIFA Rojo',  shortName:'Logo FIFA',    type:'balon', foil:false },
-  { num:7, id:'intro_8', name:'FWC7. Emblema Verde',   shortName:'Emblema Vrd.', type:'balon', foil:false },
-  { num:8, id:'intro_9', name:'FWC8. Emblema Azul',    shortName:'Emblema Azul', type:'balon', foil:false },
+  { num:5, id:'intro_6', name:'FWC5. Pelota Oficial',  shortName:'Pelota Oficial', type:'foil', foil:true },
+  { num:6, id:'intro_7', name:'FWC6. Emblema Rojo',    shortName:'Emblema Rojo',   type:'foil', foil:true },
+  { num:7, id:'intro_8', name:'FWC7. Emblema Verde',   shortName:'Emblema Verde',  type:'foil', foil:true },
+  { num:8, id:'intro_9', name:'FWC8. Emblema Azul',    shortName:'Emblema Azul',   type:'foil', foil:true },
 ];
 
 // Backward compat alias used by stats / PDF
 export const INTRO_STICKERS = [...ESPECIALES_STICKERS, ...BALON_STICKERS];
 
 // ── Museo FIFA stickers (local numbering 1–11) ────────────────
-// Historia: #09–19 (album sticker numbers 9-19 → internal museum_1..11)
+// Historia: #09–19 — TODAS brillantes, nombres = año del mundial
 export const HISTORIA_STICKERS = [
-  { num: 9, id:'museum_1',  name:'FWC9. Sede Canadá',              shortName:'Sede Canadá',   type:'foil',    foil:true  },
-  { num:10, id:'museum_2',  name:'FWC10. Sede EE.UU.',             shortName:'Sede EE.UU.',   type:'special', foil:false },
-  { num:11, id:'museum_3',  name:'FWC11. Sede México',             shortName:'Sede México',   type:'special', foil:false },
-  { num:12, id:'museum_4',  name:'FWC12. Museo: Uruguay 1930',     shortName:'Uruguay 1930',  type:'special', foil:false },
-  { num:13, id:'museum_5',  name:'FWC13. Museo: Italia 1934',      shortName:'Italia 1934',   type:'special', foil:false },
-  { num:14, id:'museum_6',  name:'FWC14. Museo: Francia 1938',     shortName:'Francia 1938',  type:'special', foil:false },
-  { num:15, id:'museum_7',  name:'FWC15. Museo: Brasil 1950',      shortName:'Brasil 1950',   type:'special', foil:false },
-  { num:16, id:'museum_8',  name:'FWC16. Museo: Suiza 1954',       shortName:'Suiza 1954',    type:'special', foil:false },
-  { num:17, id:'museum_9',  name:'FWC17. Museo: Suecia 1958',      shortName:'Suecia 1958',   type:'special', foil:false },
-  { num:18, id:'museum_10', name:'FWC18. Museo: Chile 1962',       shortName:'Chile 1962',    type:'special', foil:false },
-  { num:19, id:'museum_11', name:'FWC19. Museo: Inglaterra 1966',  shortName:'Ing. 1966',     type:'special', foil:false },
+  { num: 9, id:'museum_1',  name:'Historia 1934',  shortName:'1934', type:'foil', foil:true },
+  { num:10, id:'museum_2',  name:'Historia 1950',  shortName:'1950', type:'foil', foil:true },
+  { num:11, id:'museum_3',  name:'Historia 1954',  shortName:'1954', type:'foil', foil:true },
+  { num:12, id:'museum_4',  name:'Historia 1962',  shortName:'1962', type:'foil', foil:true },
+  { num:13, id:'museum_5',  name:'Historia 1974',  shortName:'1974', type:'foil', foil:true },
+  { num:14, id:'museum_6',  name:'Historia 1986',  shortName:'1986', type:'foil', foil:true },
+  { num:15, id:'museum_7',  name:'Historia 1994',  shortName:'1994', type:'foil', foil:true },
+  { num:16, id:'museum_8',  name:'Historia 2002',  shortName:'2002', type:'foil', foil:true },
+  { num:17, id:'museum_9',  name:'Historia 2006',  shortName:'2006', type:'foil', foil:true },
+  { num:18, id:'museum_10', name:'Historia 2014',  shortName:'2014', type:'foil', foil:true },
+  { num:19, id:'museum_11', name:'Historia 2022',  shortName:'2022', type:'foil', foil:true },
 ];
 
 // Backward compat alias

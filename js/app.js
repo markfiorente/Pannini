@@ -237,12 +237,13 @@ function createStickerCard(sticker) {
   card.dataset.type = sticker.type || '';
   card.title = `#${sticker.num} – ${sticker.name}`;
 
-  // For special sections use the short name; for team stickers use the type label
+  // Foil stickers always show ✨; special sections show their shortName on the card
+  const displayIcon  = sticker.foil ? '✨' : (typeInfo.icon || '');
   const displayLabel = sticker.shortName || typeInfo.label || '';
 
   card.innerHTML = `
     <span class="sc-num">#${sticker.num}</span>
-    <span class="sc-icon">${typeInfo.icon || ''}</span>
+    <span class="sc-icon">${displayIcon}</span>
     <span class="sc-label">${displayLabel}</span>
     <div class="sc-dup" id="dup-${sticker.id}"></div>
   `;
@@ -493,7 +494,27 @@ function handleSearch(e) {
   });
 }
 
+function ensureAllTeamsExpanded() {
+  TEAM_ORDER.forEach(teamId => {
+    const grid   = document.getElementById(`sgrid-${teamId}`);
+    const header = document.querySelector(`#team-${teamId} .team-header`);
+    if (!grid || !header) return;
+    if (grid.classList.contains('collapsed')) {
+      grid.classList.remove('collapsed');
+      header.setAttribute('aria-expanded', 'true');
+      const icon = header.querySelector('.collapse-icon');
+      if (icon) icon.textContent = '▲';
+    }
+    if (grid.childElementCount === 0) {
+      buildTeamStickers(TEAMS[teamId]).forEach(s => grid.appendChild(createStickerCard(s)));
+    }
+  });
+}
+
 function applyCurrentFilter() {
+  if (currentFilter === 'badge' || currentFilter === 'squad') {
+    ensureAllTeamsExpanded();
+  }
   document.querySelectorAll('.sticker-card').forEach(card => {
     const count = stickerState[card.dataset.id] || 0;
     let visible = true;
