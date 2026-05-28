@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Preview Planilla</title>
+<style>
+@page { size: A4 portrait; margin: 5mm; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; background: #e8e8e8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pw { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 32px rgba(0,0,0,.2); }
+.hd { background: #050505; padding: 3mm 5mm; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #ff6b00; }
+.ht { font-size: 17pt; font-weight: 900; color: #ff6b00; letter-spacing: .5px; line-height: 1; }
+.hs { font-size: 6.5pt; color: #888; margin-top: 2px; }
+.mf { display: flex; align-items: center; gap: 5px; }
+.mfb { background: #ff6b00; color: #050505; font-weight: 900; font-size: 9pt; padding: 2px 6px; border-radius: 3px; }
+.mfn { color: #fff; font-weight: 700; font-size: 8pt; }
+.st  { color: #777; font-size: 6pt; margin-top: 3px; text-align: right; }
+.st b{ color: #ff8c35; }
+.ch { display: flex; align-items: center; background: #111; border-bottom: 1px solid #2a2a2a; padding: 0 5mm; height: 13px; }
+.che { width: 55px; min-width: 55px; font-size: 5pt; font-weight: 700; color: #555; padding-left: 2px; }
+.chw { display: flex; flex: 1; }
+.cn  { flex: 1; text-align: center; font-size: 5pt; font-weight: 600; color: #444; line-height: 13px; }
+.cn.hi { color: #ff8c35; font-weight: 800; }
+.ct { padding: 0 5mm; }
+.gb { }
+.gl { background: #111; color: #ff6b00; font-size: 5.5pt; font-weight: 900; letter-spacing: 1px; padding: 1px 4px; border-left: 3px solid #ff6b00; }
+.row { display: flex; align-items: center; height: 15px; border-bottom: .5px solid #ebebeb; background: #fff; }
+.row.alt  { background: #f7f7f7; }
+.row.sp   { background: #0d0d0d; height: 16px; }
+.fc { width: 20px; min-width: 20px; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; }
+.cc { width: 35px; min-width: 35px; display: flex; flex-direction: column; justify-content: center; padding: 0 2px; height: 100%; font-size: 6.5pt; font-weight: 800; color: #1a1a1a; }
+.cc b   { font-size: 6.5pt; line-height: 1; }
+.pg     { font-size: 4.8pt; color: #aaa; font-weight: 400; line-height: 1; }
+.pg.ok-t{ color: #2a7a3e; font-weight: 700; }
+.cw { display: flex; flex: 1; height: 100%; align-items: center; gap: 1px; padding: 1.5px 0; }
+.c { flex: 1; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 5.5pt; font-weight: 600; border-radius: 1px; border: .5px solid #e0e0e0; color: #d0d0d0; background: #fff; }
+.c.ok { background: #d6f0de; border-color: #5cb87a; color: #1c6b30; font-weight: 800; }
+.c.fo { background: #fff3d6; border-color: #f0a830; color: #8a5f08; font-weight: 800; }
+.c.fm { background: #fffbee; border-color: #d4b84a; color: #b0962a; }
+.c.dp { background: #ff6b00; border-color: #ff6b00; color: #fff; font-weight: 800; }
+.ft { background: #050505; border-top: 2.5px solid #ff6b00; padding: 2.5mm 5mm; display: flex; align-items: center; justify-content: space-between; }
+.lg { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+.li { display: flex; align-items: center; gap: 3px; font-size: 5.5pt; color: #888; }
+.ls { width: 9px; height: 9px; border-radius: 1px; border: .8px solid; flex-shrink: 0; }
+.fb { color: #555; font-size: 5.5pt; text-align: right; line-height: 1.5; }
+.fb b{ color: #ff6b00; }
+</style>
+</head>
+<body>
+<div class="pw">
+  <div class="hd">
+    <div>
+      <div class="ht">Planilla de Control</div>
+      <div class="hs">FIFA WORLD CUP 2026 &nbsp;·&nbsp; ÁLBUM PANINI &nbsp;·&nbsp; 28/5/2026</div>
+    </div>
+    <div>
+      <div class="mf">
+        <span class="mfb">MF</span>
+        <span class="mfn">MARKFIORENTE</span>
+      </div>
+      <div class="st">
+        <b>38</b> conseguidas &nbsp;·&nbsp;
+        <b>956</b> faltantes &nbsp;·&nbsp;
+        <b>4%</b> completo
+      </div>
+    </div>
+  </div>
+  <div class="ch">
+    <div class="che">EQUIPO</div>
+    <div class="chw"><div class="cn hi">1</div><div class="cn">2</div><div class="cn">3</div><div class="cn">4</div><div class="cn">5</div><div class="cn">6</div><div class="cn">7</div><div class="cn">8</div><div class="cn">9</div><div class="cn">10</div><div class="cn">11</div><div class="cn">12</div><div class="cn hi">13</div><div class="cn">14</div><div class="cn">15</div><div class="cn">16</div><div class="cn">17</div><div class="cn">18</div><div class="cn">19</div><div class="cn">20</div></div>
+  </div>
+  <div class="ct">
+    
+<div class="row sp">
+  <div class="fc" style="background:#ff6b00;color:#fff;font-size:6pt;font-weight:900;letter-spacing:.5px;justify-content:center">ESP</div>
+  <div class="cc" style="color:#ff6b00">2<span style="color:#555">/5</span></div>
+  <div class="cw">
+    <div class="c fo" style="width:140px;min-width:140px;font-size:5.5pt">Logo Panini</div><div class="c fo" style="width:140px;min-width:140px;font-size:5.5pt">Trofeo Sup.</div><div class="c fm" style="width:140px;min-width:140px;font-size:5.5pt">Trofeo Inf.</div><div class="c fm" style="width:140px;min-width:140px;font-size:5.5pt">Mascotas</div><div class="c fm" style="width:140px;min-width:140px;font-size:5.5pt">We Are 26</div>
+  </div>
+</div>
+    
+<div class="row sp">
+  <div class="fc" style="background:#ff8c35;color:#fff;font-size:6pt;font-weight:900;letter-spacing:.5px;justify-content:center">BYP</div>
+  <div class="cc" style="color:#ff8c35">0<span style="color:#555">/4</span></div>
+  <div class="cw">
+    <div class="c fm" style="width:175px;min-width:175px;font-size:5.5pt">Pelota Oficial</div><div class="c fm" style="width:175px;min-width:175px;font-size:5.5pt">Emblema Rojo</div><div class="c fm" style="width:175px;min-width:175px;font-size:5.5pt">Emblema Verde</div><div class="c fm" style="width:175px;min-width:175px;font-size:5.5pt">Emblema Azul</div>
+  </div>
+</div>
+    
+<div class="row sp">
+  <div class="fc" style="background:#ff8c35;color:#fff;font-size:6pt;font-weight:900;letter-spacing:.5px;justify-content:center">HIST</div>
+  <div class="cc" style="color:#ff8c35">2<span style="color:#555">/11</span></div>
+  <div class="cw">
+    <div class="c fo" style="width:63px;min-width:63px;font-size:5.5pt">1934</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">1950</div><div class="c fo" style="width:63px;min-width:63px;font-size:5.5pt">1954</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">1962</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">1974</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">1986</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">1994</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">2002</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">2006</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">2014</div><div class="c fm" style="width:63px;min-width:63px;font-size:5.5pt">2022</div>
+  </div>
+</div>
+    
+<div class="row sp">
+  <div class="fc" style="background:#c0392b;color:#fff;font-size:6pt;font-weight:900;letter-spacing:.5px;justify-content:center">CC</div>
+  <div class="cc" style="color:#c0392b">3<span style="color:#555">/14</span></div>
+  <div class="cw">
+    <div class="c fo" style="width:50px;min-width:50px;font-size:5.5pt">CC1</div><div class="c fo" style="width:50px;min-width:50px;font-size:5.5pt">CC2</div><div class="c fo" style="width:50px;min-width:50px;font-size:5.5pt">CC3</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC4</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC5</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC6</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC7</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC8</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC9</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC10</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC11</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC12</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC13</div><div class="c fm" style="width:50px;min-width:50px;font-size:5.5pt">CC14</div>
+  </div>
+</div>
+    <div class="gb"><div class="gl">GRUPO A</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/mx.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="MEX">
+  </div>
+  <div class="cc">
+    <b>MEX</b>
+    <span class="pg">4/20</span>
+  </div>
+  <div class="cw"><div class="c fo">1</div><div class="c ok">2</div><div class="c ok">3</div><div class="c dp">×3</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/za.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="RSA">
+  </div>
+  <div class="cc">
+    <b>RSA</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/kr.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="KOR">
+  </div>
+  <div class="cc">
+    <b>KOR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/cz.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CZE">
+  </div>
+  <div class="cc">
+    <b>CZE</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO B</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ca.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CAN">
+  </div>
+  <div class="cc">
+    <b>CAN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ch.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="SUI">
+  </div>
+  <div class="cc">
+    <b>SUI</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/qa.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="QAT">
+  </div>
+  <div class="cc">
+    <b>QAT</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ba.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="BIH">
+  </div>
+  <div class="cc">
+    <b>BIH</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO C</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/br.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="BRA">
+  </div>
+  <div class="cc">
+    <b>BRA</b>
+    <span class="pg">4/20</span>
+  </div>
+  <div class="cw"><div class="c fo">1</div><div class="c ok">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c ok">13</div><div class="c ok">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ma.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="MAR">
+  </div>
+  <div class="cc">
+    <b>MAR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ht.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="HAI">
+  </div>
+  <div class="cc">
+    <b>HAI</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/gb-sct.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="SCO">
+  </div>
+  <div class="cc">
+    <b>SCO</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO D</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/us.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="USA">
+  </div>
+  <div class="cc">
+    <b>USA</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/py.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="PAR">
+  </div>
+  <div class="cc">
+    <b>PAR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/au.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="AUS">
+  </div>
+  <div class="cc">
+    <b>AUS</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/tr.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="TUR">
+  </div>
+  <div class="cc">
+    <b>TUR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO E</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/de.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="GER">
+  </div>
+  <div class="cc">
+    <b>GER</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/cw.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CUW">
+  </div>
+  <div class="cc">
+    <b>CUW</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ci.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CIV">
+  </div>
+  <div class="cc">
+    <b>CIV</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ec.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="ECU">
+  </div>
+  <div class="cc">
+    <b>ECU</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO F</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/nl.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="NED">
+  </div>
+  <div class="cc">
+    <b>NED</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/jp.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="JPN">
+  </div>
+  <div class="cc">
+    <b>JPN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/tn.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="TUN">
+  </div>
+  <div class="cc">
+    <b>TUN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/se.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="SWE">
+  </div>
+  <div class="cc">
+    <b>SWE</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO G</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/be.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="BEL">
+  </div>
+  <div class="cc">
+    <b>BEL</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/eg.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="EGY">
+  </div>
+  <div class="cc">
+    <b>EGY</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ir.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="IRN">
+  </div>
+  <div class="cc">
+    <b>IRN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/nz.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="NZL">
+  </div>
+  <div class="cc">
+    <b>NZL</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO H</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/es.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="ESP">
+  </div>
+  <div class="cc">
+    <b>ESP</b>
+    <span class="pg ok-t">20/20</span>
+  </div>
+  <div class="cw"><div class="c fo">1</div><div class="c ok">2</div><div class="c ok">3</div><div class="c ok">4</div><div class="c ok">5</div><div class="c ok">6</div><div class="c ok">7</div><div class="c ok">8</div><div class="c ok">9</div><div class="c ok">10</div><div class="c ok">11</div><div class="c ok">12</div><div class="c ok">13</div><div class="c ok">14</div><div class="c ok">15</div><div class="c ok">16</div><div class="c ok">17</div><div class="c ok">18</div><div class="c ok">19</div><div class="c ok">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/cv.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CPV">
+  </div>
+  <div class="cc">
+    <b>CPV</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/sa.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="KSA">
+  </div>
+  <div class="cc">
+    <b>KSA</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/uy.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="URU">
+  </div>
+  <div class="cc">
+    <b>URU</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO I</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/fr.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="FRA">
+  </div>
+  <div class="cc">
+    <b>FRA</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/sn.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="SEN">
+  </div>
+  <div class="cc">
+    <b>SEN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/no.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="NOR">
+  </div>
+  <div class="cc">
+    <b>NOR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/iq.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="IRQ">
+  </div>
+  <div class="cc">
+    <b>IRQ</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO J</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/ar.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="ARG">
+  </div>
+  <div class="cc">
+    <b>ARG</b>
+    <span class="pg">3/20</span>
+  </div>
+  <div class="cw"><div class="c dp">×2</div><div class="c dp">×2</div><div class="c dp">×2</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/dz.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="ALG">
+  </div>
+  <div class="cc">
+    <b>ALG</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/at.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="AUT">
+  </div>
+  <div class="cc">
+    <b>AUT</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/jo.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="JOR">
+  </div>
+  <div class="cc">
+    <b>JOR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO K</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/pt.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="POR">
+  </div>
+  <div class="cc">
+    <b>POR</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/uz.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="UZB">
+  </div>
+  <div class="cc">
+    <b>UZB</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/co.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="COL">
+  </div>
+  <div class="cc">
+    <b>COL</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/cd.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="COD">
+  </div>
+  <div class="cc">
+    <b>COD</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div><div class="gb"><div class="gl">GRUPO L</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/gb-eng.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="ENG">
+  </div>
+  <div class="cc">
+    <b>ENG</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/hr.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="CRO">
+  </div>
+  <div class="cc">
+    <b>CRO</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/gh.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="GHA">
+  </div>
+  <div class="cc">
+    <b>GHA</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div>
+<div class="row alt">
+  <div class="fc">
+    <img src="https://flagcdn.com/w20/pa.png" width="18" height="12" style="object-fit:cover;border-radius:1px;display:block" alt="PAN">
+  </div>
+  <div class="cc">
+    <b>PAN</b>
+    <span class="pg">0/20</span>
+  </div>
+  <div class="cw"><div class="c fm">1</div><div class="c">2</div><div class="c">3</div><div class="c">4</div><div class="c">5</div><div class="c">6</div><div class="c">7</div><div class="c">8</div><div class="c">9</div><div class="c">10</div><div class="c">11</div><div class="c">12</div><div class="c">13</div><div class="c">14</div><div class="c">15</div><div class="c">16</div><div class="c">17</div><div class="c">18</div><div class="c">19</div><div class="c">20</div></div>
+</div></div>
+  </div>
+  <div class="ft">
+    <div class="lg">
+      <div class="li"><div class="ls" style="background:#d6f0de;border-color:#5cb87a"></div>Tengo</div>
+      <div class="li"><div class="ls" style="background:#fff3d6;border-color:#f0a830"></div>Brillante</div>
+      <div class="li"><div class="ls" style="background:#ff6b00;border-color:#ff6b00"></div>Repetida</div>
+      <div class="li"><div class="ls" style="background:#fffbee;border-color:#d4b84a"></div>Brill. faltante</div>
+      <div class="li"><div class="ls" style="background:#fff;border-color:#ddd"></div>Falta</div>
+    </div>
+    <div class="fb">
+      <b>markfiorente.com</b><br>FIFA World Cup 2026 Sticker Tracker
+    </div>
+  </div>
+</div>
+</body>
+</html>
