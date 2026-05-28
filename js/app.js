@@ -538,9 +538,9 @@ function setupUserMenu() {
 
   document.getElementById('export-stickers-btn')?.addEventListener('click', async () => {
     dropdown?.classList.remove('open');
-    showToast('Generando planilla PDF... ⏳');
-    const { exportStickersPDF } = await import('./pdf.js');
-    await exportStickersPDF(stickerState);
+    showToast('Abriendo planilla... ⏳');
+    const { exportPlanillaHTML } = await import('./planilla.js');
+    exportPlanillaHTML(stickerState);
   });
 
   document.getElementById('export-missing-btn')?.addEventListener('click', async () => {
