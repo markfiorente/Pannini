@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Planilla Preview</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  body { margin:0; background:#111; display:flex; flex-direction:column; align-items:center; }
+  h2   { color:#ff6b00; font-family:Arial; margin:8px 0; font-size:14px; }
+  #pdf-frame { width:794px; height:1123px; border:none; background:#fff; }
+</style>
+</head>
+<body>
+<h2>Planilla de Control — Vista Previa</h2>
+<iframe id="pdf-frame"></iframe>
+
+<script>
+// ─── Data ────────────────────────────────────────────────────────────────────
+const TEAM_ORDER = [
+  'mexico','south_africa','korea_republic','czechia',
+  'canada','switzerland','qatar','bosnia_herzegovina',
+  'brazil','morocco','haiti','scotland',
+  'united_states','paraguay','australia','turkiye',
+  'germany','curacao','cote_divoire','ecuador',
+  'netherlands','japan','tunisia','sweden',
+  'belgium','egypt','iran','new_zealand',
+  'spain','cabo_verde','saudi_arabia','uruguay',
+  'france','senegal','norway','iraq',
+  'argentina','algeria','austria','jordan',
+  'portugal','uzbekistan','colombia','congo_dr',
+  'england','croatia','ghana','panama',
+];
+
+const TEAMS = {
+  mexico:{id:'mexico',name:'México',shortName:'MEX',group:'A',flagCode:'mx'},
+  south_africa:{id:'south_africa',name:'Sudáfrica',shortName:'RSA',group:'A',flagCode:'za'},
+  korea_republic:{id:'korea_republic',name:'Corea del Sur',shortName:'KOR',group:'A',flagCode:'kr'},
+  czechia:{id:'czechia',name:'Chequia',shortName:'CZE',group:'A',flagCode:'cz'},
+  canada:{id:'canada',name:'Canadá',shortName:'CAN',group:'B',flagCode:'ca'},
+  switzerland:{id:'switzerland',name:'Suiza',shortName:'SUI',group:'B',flagCode:'ch'},
+  qatar:{id:'qatar',name:'Qatar',shortName:'QAT',group:'B',flagCode:'qa'},
+  bosnia_herzegovina:{id:'bosnia_herzegovina',name:'Bosnia-Herzegovina',shortName:'BIH',group:'B',flagCode:'ba'},
+  brazil:{id:'brazil',name:'Brasil',shortName:'BRA',group:'C',flagCode:'br'},
+  morocco:{id:'morocco',name:'Marruecos',shortName:'MAR',group:'C',flagCode:'ma'},
+  haiti:{id:'haiti',name:'Haití',shortName:'HAI',group:'C',flagCode:'ht'},
+  scotland:{id:'scotland',name:'Escocia',shortName:'SCO',group:'C',flagCode:'gb-sct'},
+  united_states:{id:'united_states',name:'Estados Unidos',shortName:'USA',group:'D',flagCode:'us'},
+  paraguay:{id:'paraguay',name:'Paraguay',shortName:'PAR',group:'D',flagCode:'py'},
+  australia:{id:'australia',name:'Australia',shortName:'AUS',group:'D',flagCode:'au'},
+  turkiye:{id:'turkiye',name:'Turquía',shortName:'TUR',group:'D',flagCode:'tr'},
+  germany:{id:'germany',name:'Alemania',shortName:'GER',group:'E',flagCode:'de'},
+  curacao:{id:'curacao',name:'Curazao',shortName:'CUW',group:'E',flagCode:'cw'},
+  cote_divoire:{id:'cote_divoire',name:'Costa de Marfil',shortName:'CIV',group:'E',flagCode:'ci'},
+  ecuador:{id:'ecuador',name:'Ecuador',shortName:'ECU',group:'E',flagCode:'ec'},
+  netherlands:{id:'netherlands',name:'Países Bajos',shortName:'NED',group:'F',flagCode:'nl'},
+  japan:{id:'japan',name:'Japón',shortName:'JPN',group:'F',flagCode:'jp'},
+  tunisia:{id:'tunisia',name:'Túnez',shortName:'TUN',group:'F',flagCode:'tn'},
+  sweden:{id:'sweden',name:'Suecia',shortName:'SWE',group:'F',flagCode:'se'},
+  belgium:{id:'belgium',name:'Bélgica',shortName:'BEL',group:'G',flagCode:'be'},
+  egypt:{id:'egypt',name:'Egipto',shortName:'EGY',group:'G',flagCode:'eg'},
+  iran:{id:'iran',name:'Irán',shortName:'IRN',group:'G',flagCode:'ir'},
+  new_zealand:{id:'new_zealand',name:'Nueva Zelanda',shortName:'NZL',group:'G',flagCode:'nz'},
+  spain:{id:'spain',name:'España',shortName:'ESP',group:'H',flagCode:'es'},
+  cabo_verde:{id:'cabo_verde',name:'Cabo Verde',shortName:'CPV',group:'H',flagCode:'cv'},
+  saudi_arabia:{id:'saudi_arabia',name:'Arabia Saudita',shortName:'KSA',group:'H',flagCode:'sa'},
+  uruguay:{id:'uruguay',name:'Uruguay',shortName:'URU',group:'H',flagCode:'uy'},
+  france:{id:'france',name:'Francia',shortName:'FRA',group:'I',flagCode:'fr'},
+  senegal:{id:'senegal',name:'Senegal',shortName:'SEN',group:'I',flagCode:'sn'},
+  norway:{id:'norway',name:'Noruega',shortName:'NOR',group:'I',flagCode:'no'},
+  iraq:{id:'iraq',name:'Irak',shortName:'IRQ',group:'I',flagCode:'iq'},
+  argentina:{id:'argentina',name:'Argentina',shortName:'ARG',group:'J',flagCode:'ar'},
+  algeria:{id:'algeria',name:'Argelia',shortName:'ALG',group:'J',flagCode:'dz'},
+  austria:{id:'austria',name:'Austria',shortName:'AUT',group:'J',flagCode:'at'},
+  jordan:{id:'jordan',name:'Jordania',shortName:'JOR',group:'J',flagCode:'jo'},
+  portugal:{id:'portugal',name:'Portugal',shortName:'POR',group:'K',flagCode:'pt'},
+  uzbekistan:{id:'uzbekistan',name:'Uzbekistán',shortName:'UZB',group:'K',flagCode:'uz'},
+  colombia:{id:'colombia',name:'Colombia',shortName:'COL',group:'K',flagCode:'co'},
+  congo_dr:{id:'congo_dr',name:'Congo DR',shortName:'COD',group:'K',flagCode:'cd'},
+  england:{id:'england',name:'Inglaterra',shortName:'ENG',group:'L',flagCode:'gb-eng'},
+  croatia:{id:'croatia',name:'Croacia',shortName:'CRO',group:'L',flagCode:'hr'},
+  ghana:{id:'ghana',name:'Ghana',shortName:'GHA',group:'L',flagCode:'gh'},
+  panama:{id:'panama',name:'Panamá',shortName:'PAN',group:'L',flagCode:'pa'},
+};
+
+const GROUPS = {
+  A:{teams:['mexico','south_africa','korea_republic','czechia']},
+  B:{teams:['canada','switzerland','qatar','bosnia_herzegovina']},
+  C:{teams:['brazil','morocco','haiti','scotland']},
+  D:{teams:['united_states','paraguay','australia','turkiye']},
+  E:{teams:['germany','curacao','cote_divoire','ecuador']},
+  F:{teams:['netherlands','japan','tunisia','sweden']},
+  G:{teams:['belgium','egypt','iran','new_zealand']},
+  H:{teams:['spain','cabo_verde','saudi_arabia','uruguay']},
+  I:{teams:['france','senegal','norway','iraq']},
+  J:{teams:['argentina','algeria','austria','jordan']},
+  K:{teams:['portugal','uzbekistan','colombia','congo_dr']},
+  L:{teams:['england','croatia','ghana','panama']},
+};
+
+const ESPECIALES = [
+  {num:0,id:'intro_1',name:'Logo Panini',shortName:'Logo Panini',type:'foil',foil:true},
+  {num:1,id:'intro_2',name:'Trofeo Sup.',shortName:'Trofeo Sup.',type:'foil',foil:true},
+  {num:2,id:'intro_3',name:'Trofeo Inf.',shortName:'Trofeo Inf.',type:'foil',foil:true},
+  {num:3,id:'intro_4',name:'Mascotas',shortName:'Mascotas',type:'foil',foil:true},
+  {num:4,id:'intro_5',name:'We Are 26',shortName:'We Are 26',type:'foil',foil:true},
+];
+const BALON = [
+  {num:5,id:'intro_6',shortName:'Pelota',type:'foil',foil:true},
+  {num:6,id:'intro_7',shortName:'Embl. Rojo',type:'foil',foil:true},
+  {num:7,id:'intro_8',shortName:'Embl. Verde',type:'foil',foil:true},
+  {num:8,id:'intro_9',shortName:'Embl. Azul',type:'foil',foil:true},
+];
+const HISTORIA = [1934,1950,1954,1962,1974,1986,1994,2002,2006,2014,2022].map((y,i)=>({
+  num:9+i, id:`museum_${i+1}`, shortName:String(y), type:'foil', foil:true
+}));
+const CC = Array.from({length:14},(_,i)=>({
+  num:i+1, id:`coca_cola_${i+1}`, shortName:`CC${i+1}`, type:'cc', foil:false
+}));
+
+function buildTeamStickers(team) {
+  const t = team.id;
+  return [
+    {num:1,  id:`${t}_1`,  type:'badge', foil:true},
+    {num:2,  id:`${t}_2`,  type:'gk',   foil:false},
+    {num:3,  id:`${t}_3`,  type:'gk',   foil:false},
+    {num:4,  id:`${t}_4`,  type:'def',  foil:false},
+    {num:5,  id:`${t}_5`,  type:'def',  foil:false},
+    {num:6,  id:`${t}_6`,  type:'def',  foil:false},
+    {num:7,  id:`${t}_7`,  type:'def',  foil:false},
+    {num:8,  id:`${t}_8`,  type:'def',  foil:false},
+    {num:9,  id:`${t}_9`,  type:'mid',  foil:false},
+    {num:10, id:`${t}_10`, type:'mid',  foil:false},
+    {num:11, id:`${t}_11`, type:'mid',  foil:false},
+    {num:12, id:`${t}_12`, type:'mid',  foil:false},
+    {num:13, id:`${t}_13`, type:'squad',foil:false},
+    {num:14, id:`${t}_14`, type:'mid',  foil:false},
+    {num:15, id:`${t}_15`, type:'att',  foil:false},
+    {num:16, id:`${t}_16`, type:'att',  foil:false},
+    {num:17, id:`${t}_17`, type:'att',  foil:false},
+    {num:18, id:`${t}_18`, type:'att',  foil:false},
+    {num:19, id:`${t}_19`, type:'att',  foil:false},
+    {num:20, id:`${t}_20`, type:'att',  foil:false},
+  ];
+}
+
+// ─── Mock stickerState (~407 owned, realistic pattern) ────────────────────────
+const stickerState = {};
+
+// Seed function for deterministic pseudo-random
+function seeded(seed) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+// Specials: own some
+const specials = [...ESPECIALES, ...BALON, ...HISTORIA, ...CC];
+const rngS = seeded(42);
+specials.forEach(s => {
+  const r = rngS();
+  if (r < 0.55) stickerState[s.id] = r < 0.08 ? 2 : 1;
+});
+
+// Teams: varied completion
+TEAM_ORDER.forEach((tid, ti) => {
+  const rng = seeded(ti * 7 + 13);
+  const team = TEAMS[tid];
+  const completionPct = [
+    1.0, 0.85, 0.65, 0.40,   // group A
+    0.95, 0.70, 0.30, 0.55,  // group B
+    1.0, 0.80, 0.20, 0.60,   // group C
+    0.75, 0.45, 0.90, 0.35,  // group D
+    1.0, 0.50, 0.65, 0.80,   // group E
+    0.70, 0.40, 0.55, 0.25,  // group F
+    0.85, 0.60, 0.30, 0.15,  // group G
+    0.95, 0.45, 0.70, 0.55,  // group H
+    0.80, 0.35, 0.50, 0.20,  // group I
+    1.0, 0.65, 0.40, 0.75,   // group J
+    0.90, 0.30, 0.55, 0.10,  // group K
+    0.85, 0.60, 0.45, 0.25,  // group L
+  ][ti] || 0.5;
+
+  buildTeamStickers(team).forEach(s => {
+    const r = rng();
+    if (r < completionPct) {
+      stickerState[s.id] = r < completionPct * 0.10 ? 3 : (r < completionPct * 0.20 ? 2 : 1);
+    }
+  });
+});
+
+// ─── Brand palette ───────────────────────────────────────────────────────────
+const BG      = [5,   5,   5  ];
+const SURFACE = [22,  22,  22 ];
+const SURF2   = [32,  32,  32 ];
+const SURF3   = [42,  42,  42 ];
+const ORANGE  = [255, 107,  0 ];
+const GOLD    = [255, 140, 53 ];
+const GREEN   = [0,   166, 81 ];
+const GRN_BG  = [0,    32, 14 ];
+const FOIL_BG = [52,   26,  0 ];
+const WHITE   = [255, 255, 255];
+const GRAY    = [80,   80,  80];
+const GRAY_LT = [150, 150, 150];
+
+// ─── jsPDF helpers ───────────────────────────────────────────────────────────
+function fillRect(pdf, x, y, w, h, color) {
+  pdf.setFillColor(...color);
+  pdf.rect(x, y, w, h, 'F');
+}
+
+// ─── addPlanillaPage ─────────────────────────────────────────────────────────
+function addPlanillaPage(pdf, ss) {
+  const W = 210, H = 297;
+  const ML = 7, MR = 7;
+  const UW = W - ML - MR;
+  const FLAG_W = 5, GAP1 = 1, CODE_W = 9, GAP2 = 0.5;
+  const GRID_X = ML + FLAG_W + GAP1 + CODE_W + GAP2;
+  const GRID_W = UW - FLAG_W - GAP1 - CODE_W - GAP2;
+  const CELL_W = GRID_W / 20;
+  const ROW_H  = 4.5;
+  const GRP_H  = 2;
+
+  fillRect(pdf, 0, 0, W, H, BG);
+
+  // Header
+  fillRect(pdf, 0, 0, W, 15, ORANGE);
+  pdf.setTextColor(5, 5, 5);
+  pdf.setFontSize(12.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('PLANILLA DE CONTROL', ML, 8);
+  pdf.setFontSize(6);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('FIFA WORLD CUP 2026  ·  ÁLBUM PANINI', ML, 12.5);
+
+  const BRX = W - MR - 32;
+  fillRect(pdf, BRX, 2, 32, 11, BG);
+  fillRect(pdf, BRX, 2, 7, 11, ORANGE);
+  pdf.setTextColor(5, 5, 5);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('MF', BRX + 3.5, 8.5, { align:'center' });
+  pdf.setTextColor(...WHITE);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('MARKFIORENTE', BRX + 9, 7);
+  pdf.setFontSize(4.5);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(180, 180, 180);
+  pdf.text('markfiorente.com', BRX + 9, 12);
+
+  let curY = 15;
+
+  // Column numbers header
+  fillRect(pdf, 0, curY, W, 3.5, SURF2);
+  fillRect(pdf, ML, curY, FLAG_W + GAP1 + CODE_W + GAP2, 3.5, SURFACE);
+  pdf.setTextColor(...GRAY);
+  pdf.setFontSize(3.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('EQUIPO', ML + 1, curY + 2.6);
+  for (let n = 1; n <= 20; n++) {
+    const cx = GRID_X + (n - 1) * CELL_W;
+    const hi = n === 1 || n === 13;
+    pdf.setTextColor(...(hi ? GOLD : GRAY));
+    pdf.setFontSize(hi ? 4 : 3.5);
+    pdf.setFont('helvetica', hi ? 'bold' : 'normal');
+    pdf.text(String(n), cx + CELL_W / 2, curY + 2.6, { align:'center' });
+  }
+  curY += 3.5;
+
+  // Special sections
+  const SECS = [
+    { label:'ESP',  accent:ORANGE,        stickers:ESPECIALES },
+    { label:'BYP',  accent:GOLD,          stickers:BALON      },
+    { label:'HIST', accent:GOLD,          stickers:HISTORIA   },
+    { label:'CC',   accent:[210,45,45],   stickers:CC         },
+  ];
+  SECS.forEach(({ label, accent, stickers }) => {
+    fillRect(pdf, ML, curY, UW, ROW_H, SURFACE);
+    fillRect(pdf, ML, curY, FLAG_W, ROW_H, accent);
+    pdf.setTextColor(...accent);
+    pdf.setFontSize(4);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(label, ML + FLAG_W + GAP1 + 0.5, curY + ROW_H * 0.68);
+    fillRect(pdf, GRID_X, curY, GRID_W, ROW_H, BG);
+
+    const sCW = GRID_W / stickers.length;
+    stickers.forEach((s, idx) => {
+      const cx = GRID_X + idx * sCW;
+      const cnt = ss[s.id] || 0;
+      const isOwned = cnt > 0, isDupe = cnt > 1;
+      const [bg, border, tc] = isOwned
+        ? isDupe ? [ORANGE,ORANGE,BG] : [FOIL_BG,GOLD,GOLD]
+        : [BG,[160,160,160],[110,110,110]];
+      fillRect(pdf, cx+0.2, curY+0.2, sCW-0.4, ROW_H-0.4, bg);
+      pdf.setDrawColor(...border);
+      pdf.setLineWidth(0.15);
+      pdf.rect(cx+0.2, curY+0.2, sCW-0.4, ROW_H-0.4, 'D');
+      pdf.setTextColor(...tc);
+      pdf.setFontSize(3.5);
+      pdf.setFont('helvetica', isOwned ? 'bold' : 'normal');
+      pdf.text(isDupe ? `x${cnt}` : (s.shortName || String(s.num)), cx + sCW/2, curY + ROW_H*0.7, { align:'center' });
+    });
+    curY += ROW_H;
+  });
+
+  // Orange separator
+  fillRect(pdf, 0, curY, W, 2, ORANGE);
+  curY += 2;
+
+  // Team rows
+  let prevGroup = null;
+  TEAM_ORDER.forEach((teamId, ti) => {
+    const team = TEAMS[teamId];
+    if (team.group !== prevGroup) {
+      fillRect(pdf, 0, curY, W, GRP_H, SURF2);
+      fillRect(pdf, 0, curY, 3, GRP_H, ORANGE);
+      pdf.setTextColor(...ORANGE);
+      pdf.setFontSize(4);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`GRUPO ${team.group}`, 5, curY + GRP_H - 0.4);
+      curY += GRP_H;
+      prevGroup = team.group;
+    }
+    const rowBg = ti % 2 === 0 ? BG : SURFACE;
+    fillRect(pdf, ML, curY, UW, ROW_H, rowBg);
+    fillRect(pdf, ML, curY, FLAG_W, ROW_H, SURF2);
+    pdf.setTextColor(...GRAY);
+    pdf.setFontSize(3.2);
+    pdf.setFont('helvetica', 'bold');
+    const fc = team.flagCode.replace(/-/g,'').toUpperCase().slice(0,2);
+    pdf.text(fc, ML + FLAG_W/2, curY + ROW_H*0.72, { align:'center' });
+    pdf.setTextColor(...WHITE);
+    pdf.setFontSize(4);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(team.shortName, ML + FLAG_W + GAP1 + 0.5, curY + ROW_H*0.68);
+
+    buildTeamStickers(team).forEach((s, idx) => {
+      const cx = GRID_X + idx * CELL_W;
+      const cnt = ss[s.id] || 0;
+      const isOwned = cnt > 0, isDupe = cnt > 1, isFoil = s.foil;
+      let bg, border, tc;
+      if (!isOwned) {
+        bg = rowBg;
+        border = isFoil ? [160,160,160] : [36,36,36];
+        tc = isFoil ? [130,130,130] : [50,50,50];
+      } else if (isDupe) {
+        [bg,border,tc] = [ORANGE,ORANGE,BG];
+      } else if (isFoil) {
+        [bg,border,tc] = [FOIL_BG,GOLD,GOLD];
+      } else {
+        [bg,border,tc] = [GRN_BG,GREEN,GREEN];
+      }
+      fillRect(pdf, cx+0.2, curY+0.2, CELL_W-0.4, ROW_H-0.4, bg);
+      pdf.setDrawColor(...border);
+      pdf.setLineWidth(0.12);
+      pdf.rect(cx+0.2, curY+0.2, CELL_W-0.4, ROW_H-0.4, 'D');
+      pdf.setTextColor(...tc);
+      pdf.setFontSize(3.5);
+      pdf.setFont('helvetica', isOwned ? 'bold' : 'normal');
+      pdf.text(isDupe ? `x${cnt}` : String(s.num), cx + CELL_W/2, curY + ROW_H*0.7, { align:'center' });
+    });
+    curY += ROW_H;
+  });
+
+  // Footer
+  const FY = H - 7;
+  fillRect(pdf, 0, FY, W, 7, SURFACE);
+  fillRect(pdf, 0, H-1.5, W, 1.5, ORANGE);
+  const LEG = [
+    {bg:GRN_BG,border:GREEN,lbl:'Tengo'},
+    {bg:FOIL_BG,border:GOLD,lbl:'Brillante'},
+    {bg:ORANGE,border:ORANGE,lbl:'Repetida'},
+    {bg:BG,border:[160,160,160],lbl:'Falta brillante'},
+    {bg:BG,border:[36,36,36],lbl:'Falta'},
+  ];
+  LEG.forEach(({bg,border,lbl},i) => {
+    const lx = ML + i * 33;
+    fillRect(pdf, lx, FY+1.5, 3, 3, bg);
+    pdf.setDrawColor(...border);
+    pdf.setLineWidth(0.2);
+    pdf.rect(lx, FY+1.5, 3, 3, 'D');
+    pdf.setTextColor(...GRAY_LT);
+    pdf.setFontSize(4.5);
+    pdf.text(lbl, lx+4, FY+3.8);
+  });
+  const allIds = [...ESPECIALES,...BALON,...HISTORIA,...CC,
+    ...TEAM_ORDER.flatMap(tid => buildTeamStickers(TEAMS[tid]))];
+  const owned = allIds.filter(s => (ss[s.id]||0) > 0).length;
+  pdf.setTextColor(...GRAY_LT);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica','normal');
+  pdf.text(`${owned} / ${allIds.length}  conseguidas  ·  Faltan: ${allIds.length - owned}`, ML, FY+6);
+  pdf.setTextColor(...GRAY);
+  pdf.setFontSize(4.5);
+  pdf.text('markfiorente.com', W-MR, FY+6, {align:'right'});
+}
+
+// ─── Generate & display ──────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  addPlanillaPage(pdf, stickerState);
+  const uri = pdf.output('datauristring');
+  document.getElementById('pdf-frame').src = uri;
+});
+</script>
+</body>
+</html>
