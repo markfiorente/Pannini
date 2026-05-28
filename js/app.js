@@ -538,7 +538,7 @@ function setupUserMenu() {
 
   document.getElementById('export-stickers-btn')?.addEventListener('click', async () => {
     dropdown?.classList.remove('open');
-    showToast('Generando PDF de figuritas... ⏳');
+    showToast('Generando planilla PDF... ⏳');
     const { exportStickersPDF } = await import('./pdf.js');
     await exportStickersPDF(stickerState);
   });

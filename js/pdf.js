@@ -26,27 +26,228 @@ export async function exportStickersPDF(stickerState) {
   if (!window.jspdf) { alert('jsPDF no disponible.'); return; }
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  addPlanillaPage(pdf, stickerState);
+  pdf.save(`wc2026-planilla-${timestamp()}.pdf`);
+}
 
-  const allStickers = collectAllStickers();
-  const totalOwned  = allStickers.filter(s => (stickerState[s.id] || 0) > 0).length;
-  const totalDupes  = allStickers.filter(s => (stickerState[s.id] || 0) > 1).length;
+// ─── Planilla de Control — single A4 portrait page ─────────────
+function addPlanillaPage(pdf, stickerState) {
+  const W = 210, H = 297;
+  const ML = 7, MR = 7;
+  const UW = W - ML - MR;                                // 196 mm usable
 
-  addCoverPage(pdf, 'Mi Colección', `${totalOwned} / 994 laminitas`, false);
+  const FLAG_W = 5;                                       // flag/color col
+  const GAP1   = 1;
+  const CODE_W = 9;                                       // team code col
+  const GAP2   = 0.5;
+  const GRID_X = ML + FLAG_W + GAP1 + CODE_W + GAP2;     // 22.5 mm
+  const GRID_W = UW - FLAG_W - GAP1 - CODE_W - GAP2;     // 180.5 mm
+  const CELL_W = GRID_W / 20;                             // ≈9.025 mm
+  const ROW_H  = 4.5;
+  const GRP_H  = 2;
 
-  pdf.addPage();
-  addSpecialSectionsPage(pdf, stickerState);
+  fillRect(pdf, 0, 0, W, H, BG);
 
-  Object.keys(GROUPS).forEach(letter => {
-    pdf.addPage();
-    addGroupPage(pdf, letter, stickerState);
+  // ── Header ────────────────────────────────────────────────────
+  fillRect(pdf, 0, 0, W, 15, ORANGE);
+
+  pdf.setTextColor(5, 5, 5);
+  pdf.setFontSize(12.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('PLANILLA DE CONTROL', ML, 8);
+  pdf.setFontSize(6);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('FIFA WORLD CUP 2026  ·  ÁLBUM PANINI', ML, 12.5);
+
+  // MF brand block
+  const BRX = W - MR - 32;
+  fillRect(pdf, BRX, 2,   32, 11, BG);
+  fillRect(pdf, BRX, 2,    7, 11, ORANGE);
+  pdf.setTextColor(5, 5, 5);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('MF', BRX + 3.5, 8.5, { align:'center' });
+  pdf.setTextColor(...WHITE);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('MARKFIORENTE', BRX + 9, 7);
+  pdf.setFontSize(4.5);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(180, 180, 180);
+  pdf.text('markfiorente.com', BRX + 9, 12);
+
+  let curY = 15;
+
+  // ── Column numbers header ─────────────────────────────────────
+  fillRect(pdf, 0, curY, W, 3.5, SURF2);
+  fillRect(pdf, ML, curY, FLAG_W + GAP1 + CODE_W + GAP2, 3.5, SURFACE);
+  pdf.setTextColor(...GRAY);
+  pdf.setFontSize(3.5);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('EQUIPO', ML + 1, curY + 2.6);
+
+  for (let n = 1; n <= 20; n++) {
+    const cx = GRID_X + (n - 1) * CELL_W;
+    const hi = n === 1 || n === 13;   // badge & squad highlighted
+    pdf.setTextColor(...(hi ? GOLD : GRAY));
+    pdf.setFontSize(hi ? 4 : 3.5);
+    pdf.setFont('helvetica', hi ? 'bold' : 'normal');
+    pdf.text(String(n), cx + CELL_W / 2, curY + 2.6, { align:'center' });
+  }
+  curY += 3.5;
+
+  // ── Special sections (Especiales / Balón / Historia / CC) ─────
+  const SECS = [
+    { label:'ESP',  accent:ORANGE,        stickers:ESPECIALES_STICKERS },
+    { label:'BYP',  accent:GOLD,          stickers:BALON_STICKERS      },
+    { label:'HIST', accent:GOLD,          stickers:HISTORIA_STICKERS   },
+    { label:'CC',   accent:[210, 45, 45], stickers:COCA_COLA_STICKERS  },
+  ];
+
+  SECS.forEach(({ label, accent, stickers }) => {
+    fillRect(pdf, ML, curY, UW, ROW_H, SURFACE);
+    fillRect(pdf, ML, curY, FLAG_W, ROW_H, accent);
+
+    pdf.setTextColor(...accent);
+    pdf.setFontSize(4);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(label, ML + FLAG_W + GAP1 + 0.5, curY + ROW_H * 0.68);
+
+    // Gray out grid area then draw cells
+    fillRect(pdf, GRID_X, curY, GRID_W, ROW_H, BG);
+
+    const sCW = GRID_W / stickers.length;   // adaptive width
+    stickers.forEach((s, idx) => {
+      const cx  = GRID_X + idx * sCW;
+      const cnt = stickerState[s.id] || 0;
+      const isOwned = cnt > 0, isDupe = cnt > 1;
+
+      const [bg, border, tc] = isOwned
+        ? isDupe
+          ? [ORANGE, ORANGE, BG]
+          : [FOIL_BG, GOLD, GOLD]
+        : [BG, [160, 160, 160], [110, 110, 110]];
+
+      fillRect(pdf, cx + 0.2, curY + 0.2, sCW - 0.4, ROW_H - 0.4, bg);
+      pdf.setDrawColor(...border);
+      pdf.setLineWidth(0.15);
+      pdf.rect(cx + 0.2, curY + 0.2, sCW - 0.4, ROW_H - 0.4, 'D');
+
+      pdf.setTextColor(...tc);
+      pdf.setFontSize(3.5);
+      pdf.setFont('helvetica', isOwned ? 'bold' : 'normal');
+      const txt = isDupe ? `×${cnt}` : (s.shortName || String(s.num));
+      pdf.text(txt, cx + sCW / 2, curY + ROW_H * 0.7, { align:'center' });
+    });
+
+    curY += ROW_H;
   });
 
-  if (totalDupes > 0) {
-    pdf.addPage();
-    addDuplicatesPage(pdf, stickerState);
-  }
+  // ── Orange separator bar ───────────────────────────────────────
+  fillRect(pdf, 0, curY, W, 2, ORANGE);
+  curY += 2;
 
-  pdf.save(`wc2026-coleccion-${timestamp()}.pdf`);
+  // ── Team rows ─────────────────────────────────────────────────
+  let prevGroup = null;
+
+  TEAM_ORDER.forEach((teamId, ti) => {
+    const team = TEAMS[teamId];
+
+    // Group label row
+    if (team.group !== prevGroup) {
+      fillRect(pdf, 0, curY, W, GRP_H, SURF2);
+      fillRect(pdf, 0, curY, 3, GRP_H, ORANGE);
+      pdf.setTextColor(...ORANGE);
+      pdf.setFontSize(4);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`GRUPO ${team.group}`, 5, curY + GRP_H - 0.4);
+      curY += GRP_H;
+      prevGroup = team.group;
+    }
+
+    const rowBg = ti % 2 === 0 ? BG : SURFACE;
+    fillRect(pdf, ML, curY, UW, ROW_H, rowBg);
+
+    // Flag col (country ISO abbreviation)
+    fillRect(pdf, ML, curY, FLAG_W, ROW_H, SURF2);
+    pdf.setTextColor(...GRAY);
+    pdf.setFontSize(3.2);
+    pdf.setFont('helvetica', 'bold');
+    const fc = team.flagCode.replace(/-/g, '').toUpperCase().slice(0, 2);
+    pdf.text(fc, ML + FLAG_W / 2, curY + ROW_H * 0.72, { align:'center' });
+
+    // Team code
+    pdf.setTextColor(...WHITE);
+    pdf.setFontSize(4);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(team.shortName, ML + FLAG_W + GAP1 + 0.5, curY + ROW_H * 0.68);
+
+    // 20 sticker cells
+    buildTeamStickers(team).forEach((s, idx) => {
+      const cx  = GRID_X + idx * CELL_W;
+      const cnt = stickerState[s.id] || 0;
+      const isOwned = cnt > 0, isDupe = cnt > 1, isFoil = s.foil;
+
+      let bg, border, tc;
+      if (!isOwned) {
+        bg = rowBg;
+        border = isFoil ? [160, 160, 160] : [36, 36, 36];
+        tc     = isFoil ? [130, 130, 130] : [50, 50, 50];
+      } else if (isDupe) {
+        [bg, border, tc] = [ORANGE, ORANGE, BG];
+      } else if (isFoil) {
+        [bg, border, tc] = [FOIL_BG, GOLD, GOLD];
+      } else {
+        [bg, border, tc] = [GRN_BG, GREEN, GREEN];
+      }
+
+      fillRect(pdf, cx + 0.2, curY + 0.2, CELL_W - 0.4, ROW_H - 0.4, bg);
+      pdf.setDrawColor(...border);
+      pdf.setLineWidth(0.12);
+      pdf.rect(cx + 0.2, curY + 0.2, CELL_W - 0.4, ROW_H - 0.4, 'D');
+
+      pdf.setTextColor(...tc);
+      pdf.setFontSize(3.5);
+      pdf.setFont('helvetica', isOwned ? 'bold' : 'normal');
+      pdf.text(isDupe ? `×${cnt}` : String(s.num), cx + CELL_W / 2, curY + ROW_H * 0.7, { align:'center' });
+    });
+
+    curY += ROW_H;
+  });
+
+  // ── Footer ────────────────────────────────────────────────────
+  const FY = H - 7;
+  fillRect(pdf, 0, FY, W, 7, SURFACE);
+  fillRect(pdf, 0, H - 1.5, W, 1.5, ORANGE);
+
+  // Color legend
+  const LEG = [
+    { bg:GRN_BG,  border:GREEN,        lbl:'Tengo'           },
+    { bg:FOIL_BG, border:GOLD,         lbl:'Brillante'       },
+    { bg:ORANGE,  border:ORANGE,       lbl:'Repetida'        },
+    { bg:BG,      border:[160,160,160],lbl:'Falta brillante' },
+    { bg:BG,      border:[36,36,36],   lbl:'Falta'           },
+  ];
+  LEG.forEach(({ bg, border, lbl }, i) => {
+    const lx = ML + i * 33;
+    fillRect(pdf, lx, FY + 1.5, 3, 3, bg);
+    pdf.setDrawColor(...border);
+    pdf.setLineWidth(0.2);
+    pdf.rect(lx, FY + 1.5, 3, 3, 'D');
+    pdf.setTextColor(...GRAY_LT);
+    pdf.setFontSize(4.5);
+    pdf.text(lbl, lx + 4, FY + 3.8);
+  });
+
+  const allS  = collectAllStickers();
+  const owned = allS.filter(s => (stickerState[s.id] || 0) > 0).length;
+  pdf.setTextColor(...GRAY_LT);
+  pdf.setFontSize(5.5);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(`${owned} / ${allS.length}  conseguidas  ·  Faltan: ${allS.length - owned}`, ML, FY + 6);
+  pdf.setTextColor(...GRAY);
+  pdf.setFontSize(4.5);
+  pdf.text('markfiorente.com', W - MR, FY + 6, { align:'right' });
 }
 
 export async function exportMissingPDF(stickerState) {

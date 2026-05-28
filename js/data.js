@@ -185,22 +185,14 @@ export const HISTORIA_STICKERS = [
 export const MUSEUM_STICKERS = HISTORIA_STICKERS;
 
 // Coca-Cola section: CC1–CC14 (coca_cola_1..14)
-export const COCA_COLA_STICKERS = [
-  { num: 1, id:'coca_cola_1',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 2, id:'coca_cola_2',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 3, id:'coca_cola_3',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 4, id:'coca_cola_4',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 5, id:'coca_cola_5',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 6, id:'coca_cola_6',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 7, id:'coca_cola_7',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 8, id:'coca_cola_8',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num: 9, id:'coca_cola_9',  name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num:10, id:'coca_cola_10', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num:11, id:'coca_cola_11', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num:12, id:'coca_cola_12', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num:13, id:'coca_cola_13', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-  { num:14, id:'coca_cola_14', name:'Coca-Cola WC 2026',   type:'cc', foil:false },
-];
+export const COCA_COLA_STICKERS = Array.from({ length:14 }, (_, i) => ({
+  num: i + 1,
+  id:  `coca_cola_${i + 1}`,
+  name: `Coca-Cola WC 2026 CC${i + 1}`,
+  shortName: `CC${i + 1}`,
+  type: 'cc',
+  foil: false,
+}));
 
 // ── Album data ────────────────────────────────────────────────
 function buildAlbumData() {
