@@ -157,14 +157,18 @@
         <span>/ 994</span>
       </div>
 
+      <!-- Planilla export button (always visible) -->
+      <button id="export-stickers-btn" class="planilla-btn" title="Exportar planilla PDF">
+        📋 Planilla
+      </button>
+
       <!-- User avatar + dropdown -->
       <div class="user-menu" role="navigation" aria-label="User menu">
-        <img id="user-avatar" src="" alt="Usuario" class="user-avatar" tabindex="0" role="button" aria-haspopup="true">
+        <button id="user-menu-btn" class="user-avatar-btn" aria-haspopup="true" aria-expanded="false" title="Menú usuario">
+          <img id="user-avatar" src="" alt="Usuario" class="user-avatar">
+        </button>
         <div id="user-dropdown" class="user-dropdown glass" role="menu">
           <div class="dropdown-header" id="user-display-name">Usuario</div>
-          <button id="export-stickers-btn" class="dropdown-btn" role="menuitem">
-            📋 Exportar planilla PDF
-          </button>
           <button id="export-missing-btn" class="dropdown-btn" role="menuitem">
             🔍 Exportar faltantes PDF
           </button>

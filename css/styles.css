@@ -344,8 +344,34 @@ a:hover { text-decoration: underline; }
   animation: pulse-gold 1.5s infinite;
 }
 
+/* Planilla export button */
+.planilla-btn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+.planilla-btn:hover { background: #e05a00; transform: scale(1.03); }
+
 /* User menu */
 .user-menu { position: relative; }
+.user-avatar-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .user-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
@@ -353,8 +379,9 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   object-fit: cover;
   transition: transform var(--t-fast);
+  display: block;
 }
-.user-avatar:hover { transform: scale(1.08); }
+.user-avatar-btn:hover .user-avatar { transform: scale(1.08); }
 
 .user-dropdown {
   display: none;

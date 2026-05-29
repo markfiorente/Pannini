@@ -529,15 +529,21 @@ function applyCurrentFilter() {
 
 // ── User menu ─────────────────────────────────────────────────
 function setupUserMenu() {
-  const avatar   = document.getElementById('user-avatar');
+  const menuBtn  = document.getElementById('user-menu-btn');
   const dropdown = document.getElementById('user-dropdown');
-  if (avatar && dropdown) {
-    avatar.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-    document.addEventListener('click', () => dropdown.classList.remove('open'));
+  if (menuBtn && dropdown) {
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = dropdown.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+    });
   }
 
   document.getElementById('export-stickers-btn')?.addEventListener('click', async () => {
-    dropdown?.classList.remove('open');
     showToast('Abriendo planilla... ⏳');
     const { exportPlanillaHTML } = await import('./planilla.js');
     exportPlanillaHTML(stickerState);
